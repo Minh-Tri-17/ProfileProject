@@ -521,6 +521,112 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <!-- ============ INTERACTIVE ROBOT COMPANION ============ -->
+  <div class="robo-widget" id="roboWidget">
+    <div class="robo-speech is-visible" id="roboSpeech" role="status" aria-live="polite">Hi there! 👋</div>
+    <button class="robo-btn" id="roboBtn" type="button" aria-label="Say hello to Robo companion">
+      <div class="robo-float">
+        <div class="robo-head-tilt" id="roboHeadTilt">
+          <svg class="robo-svg" viewBox="0 0 120 130" aria-hidden="true">
+            <defs>
+              <!-- Soft 3D glossy shell gradient -->
+              <linearGradient id="roboShellGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--robo-shell-hi)" />
+                <stop offset="65%" stop-color="var(--robo-shell-mid)" />
+                <stop offset="100%" stop-color="var(--robo-shell-lo)" />
+              </linearGradient>
+              <!-- Deep glossy visor screen gradient -->
+              <linearGradient id="roboVisorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="var(--robo-visor-hi)" />
+                <stop offset="100%" stop-color="var(--robo-visor-lo)" />
+              </linearGradient>
+              <!-- Glowing LED eye gradient -->
+              <radialGradient id="roboEyeGrad" cx="35%" cy="35%" r="70%">
+                <stop offset="0%" stop-color="#ffb494" />
+                <stop offset="50%" stop-color="var(--accent)" />
+                <stop offset="100%" stop-color="#b83b14" />
+              </radialGradient>
+            </defs>
+
+            <!-- Hover shadow & subtle thruster glow ring -->
+            <ellipse class="robo-shadow" cx="60" cy="121" rx="22" ry="4.5" />
+            <ellipse class="robo-thruster" cx="60" cy="109" rx="9" ry="2.6" />
+
+            <!-- Chibi Teardrop Floating Body & Flipper Arms -->
+            <g class="robo-body" id="roboBody">
+              <!-- Left & Right Cute Flipper Arms -->
+              <path class="robo-arm robo-arm--l" d="M29 79 C20 81, 18 93, 25 97 C30 99, 34 91, 33 83 Z" />
+              <path class="robo-arm robo-arm--r" d="M91 79 C100 81, 102 93, 95 97 C90 99, 86 91, 87 83 Z" />
+
+              <!-- Plump Pod Torso -->
+              <path class="robo-torso" d="M39 74 C36 74, 33 86, 39 98 C44 106, 51 108, 60 108 C69 108, 76 106, 81 98 C87 86, 84 74, 81 74 Z" />
+              <!-- Belly Panel & Glowing Heart/Core Badge -->
+              <rect class="robo-belly" x="47" y="81" width="26" height="17" rx="8.5" />
+              <path class="robo-core" d="M60 93.2 C60 93.2, 54.5 89.6, 54.5 86.3 C54.5 84.4, 56.1 83.2, 57.7 83.2 C58.9 83.2, 59.6 83.9, 60 84.7 C60.4 83.9, 61.1 83.2, 62.3 83.2 C63.9 83.2, 65.5 84.4, 65.5 86.3 C65.5 89.6, 60 93.2, 60 93.2 Z" />
+            </g>
+
+            <!-- Big Chibi Head + Cat-Ear Antenna + Glossy Visor -->
+            <g class="robo-head" id="roboHead">
+              <!-- Sprout / Bobble Antenna on top -->
+              <g class="robo-antenna" id="roboAntenna">
+                <path class="robo-antenna-stem" d="M60 22 Q61 13 65 10" />
+                <circle class="robo-antenna-glow" cx="66" cy="9" r="8" />
+                <circle class="robo-antenna-tip" cx="66" cy="9" r="4.2" />
+                <circle class="robo-antenna-shine" cx="64.6" cy="7.6" r="1.3" />
+              </g>
+
+              <!-- Cute Headphone / Ear Pods -->
+              <rect class="robo-ear" x="15" y="41" width="9" height="22" rx="4.5" />
+              <rect class="robo-ear" x="96" y="41" width="9" height="22" rx="4.5" />
+              <circle class="robo-ear-led" cx="19.5" cy="52" r="2" />
+              <circle class="robo-ear-led" cx="100.5" cy="52" r="2" />
+
+              <!-- Oversized Squircle Helmet Shell -->
+              <rect class="robo-head-shell" x="21" y="21" width="78" height="58" rx="28" />
+              <!-- Top Specular Gloss on Helmet -->
+              <path class="robo-shell-gloss" d="M38 26.5 Q60 23.5 82 26.5" />
+
+              <!-- Dark Curved Visor Screen -->
+              <rect class="robo-screen" id="roboScreen" x="28" y="30" width="64" height="41" rx="19" />
+              <!-- Glass Reflection Arc on Screen -->
+              <path class="robo-screen-glint" d="M37 35.5 Q47 33.5 57 35.5" />
+              <circle class="robo-screen-dot" cx="62.5" cy="35.3" r="1.1" />
+
+              <!-- Rosy LED Blush Cheeks -->
+              <ellipse class="robo-blush" cx="37" cy="59" rx="4.6" ry="2.2" />
+              <ellipse class="robo-blush" cx="83" cy="59" rx="4.6" ry="2.2" />
+
+              <!-- Expressive Eyes + Tiny W-Smile Group (tracks cursor) -->
+              <g class="robo-eyes" id="roboEyes">
+                <g class="robo-eyes-blink">
+                  <!-- Default Big Glossy Oval Eyes -->
+                  <g class="robo-pupils" id="roboPupils">
+                    <ellipse class="robo-pupil" id="roboPupilL" cx="46" cy="50" rx="6.2" ry="7.4" />
+                    <ellipse class="robo-pupil" id="roboPupilR" cx="74" cy="50" rx="6.2" ry="7.4" />
+                    <!-- Anime-style dual catchlights -->
+                    <circle class="robo-pupil-shine" cx="43.6" cy="46.8" r="2.3" />
+                    <circle class="robo-pupil-shine" cx="71.6" cy="46.8" r="2.3" />
+                    <circle class="robo-pupil-shine-sm" cx="48.2" cy="53.2" r="1.1" />
+                    <circle class="robo-pupil-shine-sm" cx="76.2" cy="53.2" r="1.1" />
+                  </g>
+
+                  <!-- Happy Joyful Arcs (^ ^) on Hover -->
+                  <g class="robo-happy-eyes" id="roboHappyEyes">
+                    <path d="M39.5 52.5 C41.5 44.5, 50.5 44.5, 52.5 52.5" />
+                    <path d="M67.5 52.5 C69.5 44.5, 78.5 44.5, 80.5 52.5" />
+                  </g>
+                </g>
+
+                <!-- Cute Little Mouth -->
+                <path class="robo-mouth" d="M56.5 57.5 Q60 60.8 63.5 57.5" />
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </button>
+  </div>
+
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>

@@ -365,7 +365,7 @@
   $('#year').textContent = new Date().getFullYear();
 
   /* -------------------------------------------------------
-     Ambient rising bubbles background (Canvas 2D)
+     Ambient rising micro-effervescence background (Canvas 2D)
      ------------------------------------------------------- */
   const bubbleCanvas = $('#bgBubbles');
   if (bubbleCanvas && !reduceMotion) {
@@ -374,17 +374,28 @@
     let bubbles = [];
 
     const makeBubble = (randomY = false) => {
-      const r = 3 + Math.pow(Math.random(), 1.8) * 19; // 3px – 22px
+      // Depth layer: 0 = far/bokeh, 1 = mid/champagne micro, 2 = crisp delicate ring
+      const depth = Math.random();
+      const isBokeh = depth < 0.25;
+      const r = isBokeh
+        ? 6 + Math.random() * 10 // soft far bokeh (6px – 16px)
+        : 1.2 + Math.pow(Math.random(), 2.2) * 4.8; // fine micro bubble (1.2px – 6px)
       return {
         x: Math.random() * bw,
-        y: randomY ? Math.random() * bh : bh + r + Math.random() * 60,
+        y: randomY ? Math.random() * bh : bh + r + Math.random() * 80,
         r,
-        vy: 0.25 + (24 - r) * 0.025 + Math.random() * 0.25,
-        amp: 0.3 + Math.random() * 0.9,
-        freq: 0.008 + Math.random() * 0.014,
+        isBokeh,
+        depth,
+        vy: isBokeh
+          ? 0.12 + Math.random() * 0.14
+          : 0.22 + (7 - r) * 0.045 + Math.random() * 0.18,
+        amp: isBokeh ? 0.12 + Math.random() * 0.18 : 0.15 + Math.random() * 0.35,
+        freq: 0.005 + Math.random() * 0.01,
         phase: Math.random() * Math.PI * 2,
-        accent: Math.random() < 0.38,
-        alpha: 0.14 + Math.random() * 0.22,
+        pulseSpeed: 0.012 + Math.random() * 0.018,
+        pulsePhase: Math.random() * Math.PI * 2,
+        accent: Math.random() < 0.28,
+        alpha: isBokeh ? 0.055 + Math.random() * 0.05 : 0.14 + Math.random() * 0.2,
       };
     };
 
@@ -395,7 +406,7 @@
       bubbleCanvas.width = bw * dpr;
       bubbleCanvas.height = bh * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const targetCount = Math.max(18, Math.min(42, Math.round((bw * bh) / 38000)));
+      const targetCount = Math.max(22, Math.min(48, Math.round((bw * bh) / 34000)));
       while (bubbles.length < targetCount) bubbles.push(makeBubble(true));
       if (bubbles.length > targetCount) bubbles.length = targetCount;
     };
@@ -403,57 +414,248 @@
     addEventListener('resize', resizeBubbles, { passive: true });
 
     let lastScrollForBubbles = scrollY;
+    let smoothScrollBoost = 0;
     const drawBubbles = () => {
       ctx.clearRect(0, 0, bw, bh);
       const isDark = root.dataset.theme === 'dark';
       const scrollDelta = scrollY - lastScrollForBubbles;
       lastScrollForBubbles = scrollY;
-      const scrollBoost = Math.max(-3, Math.min(6, scrollDelta * 0.12));
+      smoothScrollBoost += (Math.max(-2.5, Math.min(4, scrollDelta * 0.08)) - smoothScrollBoost) * 0.12;
 
       for (let i = 0; i < bubbles.length; i++) {
         const b = bubbles[i];
         b.phase += b.freq;
-        b.y -= b.vy + scrollBoost * (b.r / 18);
+        b.pulsePhase += b.pulseSpeed;
+        b.y -= b.vy + smoothScrollBoost * (0.4 + b.depth * 0.7);
         b.x += Math.sin(b.phase) * b.amp;
 
-        if (b.y < -b.r - 20) {
+        if (b.y < -b.r - 24) {
           Object.assign(b, makeBubble(false));
-        } else if (b.y > bh + b.r + 80) {
+        } else if (b.y > bh + b.r + 90) {
           b.y = -b.r;
         }
 
+        // Smooth fade near top & bottom viewport edges + gentle breathing
+        const edgeFade = Math.min(1, Math.max(0, Math.min(b.y / 110, (bh - b.y) / 110)));
+        const breathe = 0.82 + 0.18 * Math.sin(b.pulsePhase);
+        const a = b.alpha * edgeFade * breathe;
+        if (a <= 0.004) continue;
+
         const rgb = b.accent
-          ? (isDark ? '255, 106, 61' : '217, 84, 42')
-          : (isDark ? '220, 216, 206' : '110, 104, 94');
+          ? (isDark ? '255, 118, 76' : '217, 84, 42')
+          : (isDark ? '228, 224, 214' : '120, 114, 102');
 
-        // Soft 2.5D spherical bubble gradient
-        const g = ctx.createRadialGradient(
-          b.x - b.r * 0.32, b.y - b.r * 0.32, b.r * 0.08,
-          b.x, b.y, b.r
-        );
-        g.addColorStop(0, `rgba(255, 255, 255, ${(b.alpha * (isDark ? 0.55 : 0.9)).toFixed(3)})`);
-        g.addColorStop(0.55, `rgba(${rgb}, ${(b.alpha * 0.45).toFixed(3)})`);
-        g.addColorStop(1, `rgba(${rgb}, 0)`);
-
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
-
-        // Delicate rim + specular dot
-        ctx.lineWidth = 0.8;
-        ctx.strokeStyle = `rgba(${rgb}, ${(b.alpha * 0.55).toFixed(3)})`;
-        ctx.stroke();
-
-        if (b.r > 7) {
+        if (b.isBokeh) {
+          // Soft out-of-focus depth halo
+          const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+          g.addColorStop(0, `rgba(${rgb}, ${(a * 0.9).toFixed(3)})`);
+          g.addColorStop(0.6, `rgba(${rgb}, ${(a * 0.35).toFixed(3)})`);
+          g.addColorStop(1, `rgba(${rgb}, 0)`);
           ctx.beginPath();
-          ctx.arc(b.x - b.r * 0.34, b.y - b.r * 0.34, b.r * 0.14, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${(b.alpha * (isDark ? 0.7 : 1.1)).toFixed(3)})`;
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = g;
           ctx.fill();
+        } else {
+          // Crisp champagne micro-bubble: hollow center, delicate rim & crescent glint
+          const g = ctx.createRadialGradient(b.x, b.y, b.r * 0.15, b.x, b.y, b.r);
+          g.addColorStop(0, `rgba(${rgb}, 0)`);
+          g.addColorStop(0.72, `rgba(${rgb}, ${(a * 0.18).toFixed(3)})`);
+          g.addColorStop(1, `rgba(${rgb}, ${(a * 0.55).toFixed(3)})`);
+
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          ctx.lineWidth = 0.65;
+          ctx.strokeStyle = `rgba(${rgb}, ${(a * 0.75).toFixed(3)})`;
+          ctx.stroke();
+
+          // Tiny upper-left crescent highlight
+          if (b.r > 2.2) {
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r * 0.72, -Math.PI * 0.88, -Math.PI * 0.42);
+            ctx.lineWidth = 0.75;
+            ctx.strokeStyle = isDark
+              ? `rgba(255, 255, 255, ${(a * 0.85).toFixed(3)})`
+              : `rgba(255, 255, 255, ${Math.min(1, a * 1.6).toFixed(3)})`;
+            ctx.stroke();
+          }
         }
       }
       requestAnimationFrame(drawBubbles);
     };
     requestAnimationFrame(drawBubbles);
   }
+
+  /* -------------------------------------------------------
+     Interactive 2.5D Robot Companion (Isolated IIFE Module)
+     ------------------------------------------------------- */
+  (() => {
+    const widget = document.getElementById('roboWidget');
+    const btn = document.getElementById('roboBtn');
+    const headTilt = document.getElementById('roboHeadTilt');
+    const eyes = document.getElementById('roboEyes');
+    const speech = document.getElementById('roboSpeech');
+    if (!widget || !btn || !headTilt || !eyes || !speech) return;
+
+    const MESSAGES = {
+      en: [
+        'Hi there! Welcome 👋',
+        "I'm Tri's AI assistant 🤖",
+        'Tri builds .NET & Angular apps',
+        '3+ years in ERP & HRIS systems',
+        'Clean Architecture & fast SQL ⚡',
+        'Feel free to download his CV!',
+        "Let's build something great ✨",
+      ],
+      vi: [
+        'Xin chào! Chào mừng bạn 👋',
+        'Mình là trợ lý của Trí 🤖',
+        'Trí chuyên .NET & Angular',
+        '3+ năm làm hệ thống ERP/HRIS',
+        'Clean Architecture & tối ưu SQL ⚡',
+        'Mời bạn xem dự án & tải CV nhé!',
+        'Rất vui được kết nối cùng bạn ✨',
+      ],
+    };
+
+    let msgIndex = 0;
+    let cycleTimer = 0;
+    let fadeTimer = 0;
+    let happyTimer = 0;
+    let cycleFinished = false;
+
+    const showMessage = (index, animate = true) => {
+      const currentLang = root.lang === 'vi' ? 'vi' : 'en';
+      const list = MESSAGES[currentLang];
+      msgIndex = Math.max(0, Math.min(index, list.length - 1));
+      cycleFinished = false;
+
+      if (!animate) {
+        speech.textContent = list[msgIndex];
+        speech.classList.add('is-visible');
+        return;
+      }
+
+      speech.classList.remove('is-visible');
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => {
+        const langNow = root.lang === 'vi' ? 'vi' : 'en';
+        speech.textContent = MESSAGES[langNow][msgIndex];
+        speech.classList.add('is-visible');
+      }, 220);
+    };
+
+    const startCycle = () => {
+      clearInterval(cycleTimer);
+      cycleTimer = setInterval(() => {
+        const currentLang = root.lang === 'vi' ? 'vi' : 'en';
+        const list = MESSAGES[currentLang];
+        if (msgIndex >= list.length - 1) {
+          clearInterval(cycleTimer);
+          cycleFinished = true;
+          speech.classList.remove('is-visible');
+          return;
+        }
+        showMessage(msgIndex + 1, true);
+      }, 3500);
+    };
+
+    // Show first message immediately and run through the sequence once (3.5s each)
+    showMessage(0, false);
+    startCycle();
+
+    // Sync immediately when language changes (only if bubble is still active)
+    const langBtn = document.getElementById('langToggle');
+    if (langBtn) {
+      langBtn.addEventListener('click', () => {
+        if (cycleFinished) return;
+        setTimeout(() => showMessage(msgIndex, false), 200);
+      });
+    }
+
+    // Click / Tap Interaction: Bounce + advance (or replay once if finished)
+    btn.addEventListener('click', () => {
+      if (cycleFinished) {
+        showMessage(0, true);
+      } else {
+        const currentLang = root.lang === 'vi' ? 'vi' : 'en';
+        if (msgIndex >= MESSAGES[currentLang].length - 1) {
+          clearInterval(cycleTimer);
+          cycleFinished = true;
+          speech.classList.remove('is-visible');
+        } else {
+          showMessage(msgIndex + 1, true);
+        }
+      }
+      if (!cycleFinished) startCycle();
+
+      btn.classList.remove('is-bouncing');
+      void btn.offsetWidth; // restart CSS keyframe
+      btn.classList.add('is-bouncing');
+
+      btn.classList.add('is-happy');
+      clearTimeout(happyTimer);
+      happyTimer = setTimeout(() => btn.classList.remove('is-happy'), 1200);
+    });
+
+    // Disable continuous mouse tracking on touch devices or reduced-motion
+    if (!finePointer || reduceMotion) return;
+
+    let targetEyeX = 0, targetEyeY = 0;
+    let curEyeX = 0, curEyeY = 0;
+    let targetRotX = 0, targetRotY = 0;
+    let curRotX = 0, curRotY = 0;
+
+    const MAX_EYE_OFFSET = 5.4; // SVG units clamp inside visor screen
+    const MAX_HEAD_TILT = 18;   // Degrees for 2.5D perspective tilt
+    const LERP = 0.1;           // Smooth 60fps linear interpolation factor
+
+    addEventListener('pointermove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width * 0.5;
+      const centerY = rect.top + rect.height * 0.44;
+
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      const angle = Math.atan2(dy, dx);
+      const dist = Math.hypot(dx, dy);
+
+      // Normalized distance falloff (0 -> 1 over 320px radius)
+      const factor = Math.min(dist / 320, 1);
+
+      targetEyeX = Math.cos(angle) * MAX_EYE_OFFSET * factor;
+      targetEyeY = Math.sin(angle) * (MAX_EYE_OFFSET * 0.78) * factor;
+
+      targetRotY = (dx / Math.max(innerWidth * 0.5, 320)) * MAX_HEAD_TILT;
+      targetRotX = -(dy / Math.max(innerHeight * 0.5, 320)) * (MAX_HEAD_TILT * 0.85);
+      targetRotY = Math.max(-MAX_HEAD_TILT, Math.min(MAX_HEAD_TILT, targetRotY));
+      targetRotX = Math.max(-MAX_HEAD_TILT, Math.min(MAX_HEAD_TILT, targetRotX));
+    }, { passive: true });
+
+    document.addEventListener('pointerleave', () => {
+      targetEyeX = 0;
+      targetEyeY = 0;
+      targetRotX = 0;
+      targetRotY = 0;
+    });
+
+    const tickRobo = () => {
+      curEyeX += (targetEyeX - curEyeX) * LERP;
+      curEyeY += (targetEyeY - curEyeY) * LERP;
+      curRotX += (targetRotX - curRotX) * LERP;
+      curRotY += (targetRotY - curRotY) * LERP;
+
+      eyes.setAttribute(
+        'transform',
+        `translate(${curEyeX.toFixed(2)} ${curEyeY.toFixed(2)})`
+      );
+      headTilt.style.transform =
+        `perspective(520px) rotateX(${curRotX.toFixed(2)}deg) rotateY(${curRotY.toFixed(2)}deg)`;
+
+      requestAnimationFrame(tickRobo);
+    };
+    requestAnimationFrame(tickRobo);
+  })();
 })();

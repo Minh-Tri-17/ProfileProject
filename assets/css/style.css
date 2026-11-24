@@ -763,6 +763,378 @@ html[lang="vi"] .lang-toggle__opt[data-lang="vi"] { color: var(--bg); }
 }
 
 /* =========================================================
+   INTERACTIVE ROBOT COMPANION (.robo-*)
+   High-contrast palette: Light page -> Dark Robot | Dark page -> Light Robot
+   ========================================================= */
+:root {
+  --robo-shell-hi: #34332f;
+  --robo-shell-mid: #23221f;
+  --robo-shell-lo: #191917;
+  --robo-rim: rgba(22, 21, 19, 0.35);
+  --robo-belly-bg: #f4f2ed;
+  --robo-gloss: rgba(255, 255, 255, 0.32);
+  --robo-visor-hi: #fffdf9;
+  --robo-visor-lo: #eae5dc;
+  --robo-visor-stroke: rgba(255, 255, 255, 0.65);
+  --robo-glint: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] {
+  --robo-shell-hi: #ffffff;
+  --robo-shell-mid: #f5f3ee;
+  --robo-shell-lo: #dcd7cc;
+  --robo-rim: rgba(22, 21, 19, 0.25);
+  --robo-belly-bg: #1e1e1b;
+  --robo-gloss: rgba(255, 255, 255, 0.85);
+  --robo-visor-hi: #252421;
+  --robo-visor-lo: #121210;
+  --robo-visor-stroke: rgba(22, 21, 19, 0.25);
+  --robo-glint: rgba(255, 255, 255, 0.22);
+}
+
+.robo-widget {
+  position: fixed;
+  right: clamp(16px, 2.4vw, 28px);
+  bottom: clamp(16px, 2.4vw, 26px);
+  z-index: 75;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+  user-select: none;
+}
+
+.robo-speech {
+  position: relative;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transform-origin: 90% 100%;
+  transition: opacity 0.28s var(--ease), transform 0.32s var(--ease);
+}
+
+.robo-speech.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.robo-btn {
+  width: 96px;
+  height: 106px;
+  padding: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  perspective: 560px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.3s var(--ease);
+}
+
+.robo-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 24px;
+}
+
+.robo-btn.is-bouncing {
+  animation: roboBounce 0.56s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.robo-float {
+  width: 100%;
+  height: 100%;
+  animation: roboFloat 3.4s ease-in-out infinite;
+}
+
+.robo-head-tilt {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.robo-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 12px 20px rgba(22, 21, 19, 0.16));
+}
+
+[data-theme="dark"] .robo-svg {
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.65));
+}
+
+/* Hover shadow & jet thruster */
+.robo-shadow {
+  fill: rgba(22, 21, 19, 0.13);
+  transform-origin: 60px 121px;
+  animation: roboShadowPulse 3.4s ease-in-out infinite;
+}
+
+[data-theme="dark"] .robo-shadow {
+  fill: rgba(0, 0, 0, 0.48);
+}
+
+.robo-thruster {
+  fill: var(--accent);
+  opacity: 0.35;
+  transform-origin: 60px 109px;
+  animation: roboAntennaPulse 1.8s ease-in-out infinite;
+}
+
+/* Chibi Body & Flipper Arms */
+.robo-head-shell,
+.robo-torso {
+  fill: url(#roboShellGrad);
+  stroke: var(--robo-rim);
+  stroke-width: 1.6;
+}
+
+.robo-shell-gloss {
+  fill: none;
+  stroke: var(--robo-gloss);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.robo-belly {
+  fill: var(--robo-belly-bg);
+  stroke: var(--robo-rim);
+  stroke-width: 1;
+}
+
+.robo-ear,
+.robo-arm {
+  fill: url(#roboShellGrad);
+  stroke: var(--robo-rim);
+  stroke-width: 1.5;
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.robo-arm--l {
+  transform-origin: 33px 82px;
+}
+
+.robo-arm--r {
+  transform-origin: 87px 82px;
+}
+
+.robo-ear-led {
+  fill: var(--accent);
+  opacity: 0.75;
+}
+
+.robo-core {
+  fill: var(--accent);
+  opacity: 0.88;
+  transform-origin: 60px 88px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+
+/* Sprout Antenna */
+.robo-antenna {
+  transform-origin: 60px 22px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.robo-antenna-stem {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.robo-antenna-tip {
+  fill: var(--accent);
+  transform-origin: 66px 9px;
+  transition: transform 0.3s var(--ease);
+}
+
+.robo-antenna-shine {
+  fill: #ffffff;
+  opacity: 0.85;
+}
+
+.robo-antenna-glow {
+  fill: var(--accent);
+  opacity: 0.24;
+  transform-origin: 66px 9px;
+  animation: roboAntennaPulse 2.2s ease-in-out infinite;
+  transition: opacity 0.3s, transform 0.3s var(--ease);
+}
+
+/* Glossy Face Visor */
+.robo-screen {
+  fill: url(#roboVisorGrad);
+  stroke: var(--robo-visor-stroke);
+  stroke-width: 1.4;
+}
+
+.robo-screen-glint {
+  fill: none;
+  stroke: var(--robo-glint);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.robo-screen-dot {
+  fill: var(--robo-glint);
+}
+
+/* Expressive Eyes, Blush & Smile */
+.robo-pupil {
+  fill: url(#roboEyeGrad);
+}
+
+.robo-pupil-shine,
+.robo-pupil-shine-sm {
+  fill: #ffffff;
+}
+
+.robo-blush {
+  fill: #ff7b6b;
+  opacity: 0.22;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  transform-origin: center;
+}
+
+.robo-mouth {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.85;
+  transition: transform 0.3s var(--ease);
+  transform-origin: 60px 58px;
+}
+
+.robo-eyes {
+  will-change: transform;
+}
+
+.robo-eyes-blink {
+  transform-origin: 60px 50px;
+  animation: roboBlink 4.2s infinite;
+}
+
+.robo-happy-eyes {
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.robo-happy-eyes path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+.robo-pupils {
+  transition: opacity 0.2s var(--ease);
+}
+
+/* Hover / Happy States: Joyful eyes (^ ^), flapping arms, glowing heart & antenna */
+.robo-btn:hover .robo-pupils,
+.robo-btn.is-happy .robo-pupils {
+  opacity: 0;
+}
+
+.robo-btn:hover .robo-happy-eyes,
+.robo-btn.is-happy .robo-happy-eyes {
+  opacity: 1;
+}
+
+.robo-btn:hover .robo-blush,
+.robo-btn.is-happy .robo-blush {
+  opacity: 0.65;
+}
+
+.robo-btn:hover .robo-mouth,
+.robo-btn.is-happy .robo-mouth {
+  transform: scale(1.22) translateY(0.5px);
+}
+
+.robo-btn:hover .robo-arm--l,
+.robo-btn.is-happy .robo-arm--l {
+  transform: rotate(22deg) translateY(-2px);
+}
+
+.robo-btn:hover .robo-arm--r,
+.robo-btn.is-happy .robo-arm--r {
+  transform: rotate(-22deg) translateY(-2px);
+}
+
+.robo-btn:hover .robo-antenna,
+.robo-btn.is-happy .robo-antenna {
+  transform: rotate(8deg);
+}
+
+.robo-btn:hover .robo-antenna-glow,
+.robo-btn.is-happy .robo-antenna-glow {
+  opacity: 0.6;
+  transform: scale(1.5);
+}
+
+.robo-btn:hover .robo-core,
+.robo-btn.is-happy .robo-core {
+  transform: scale(1.24);
+  opacity: 1;
+}
+
+@keyframes roboFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes roboShadowPulse {
+  0%, 100% { transform: scaleX(1); opacity: 1; }
+  50% { transform: scaleX(0.82); opacity: 0.65; }
+}
+
+@keyframes roboBlink {
+  0%, 44%, 48%, 94%, 98%, 100% { transform: scaleY(1); }
+  46%, 96% { transform: scaleY(0.08); }
+}
+
+@keyframes roboAntennaPulse {
+  0%, 100% { transform: scale(0.95); opacity: 0.18; }
+  50% { transform: scale(1.25); opacity: 0.36; }
+}
+
+@keyframes roboBounce {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-14px) scale(1.06, 0.95); }
+  55% { transform: translateY(2px) scale(0.96, 1.04); }
+  75% { transform: translateY(-5px) scale(1.02, 0.99); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 640px) {
+  .robo-widget {
+    right: 12px;
+    bottom: 12px;
+  }
+  .robo-btn {
+    width: 72px;
+    height: 80px;
+  }
+  .robo-speech {
+    font-size: 11px;
+    padding: 6px 11px;
+  }
+}
+
+/* =========================================================
    REDUCED MOTION
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
