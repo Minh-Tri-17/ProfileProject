@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Nguyễn Minh Trí — Backend / Full-stack Developer</title>
+  <meta name="description" content="Nguyễn Minh Trí — Backend / Full-stack Developer (.NET & Angular) based in Ho Chi Minh City. RESTful APIs, SQL Server optimization, Clean Architecture, JWT/RBAC." />
+  <meta name="author" content="Nguyễn Minh Trí" />
+  <meta property="og:title" content="Nguyễn Minh Trí — Backend / Full-stack Developer" />
+  <meta property="og:description" content="Backend developer building enterprise systems (ERP, HRIS) on .NET & Angular." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#f4f2ed" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23161513'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial,sans-serif' font-weight='700' font-size='26' fill='%23f4f2ed'%3EMT%3C/text%3E%3Ccircle cx='48' cy='44' r='4' fill='%23e0562b'/%3E%3C/svg%3E" />
+
+  <!-- Apply saved / system theme before paint to avoid flashing -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5M5 20.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15 9V6.5A2.5 2.5 0 0 0 12.5 4h-6A2.5 2.5 0 0 0 4 6.5v6A2.5 2.5 0 0 0 6.5 15H9" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></symbol>
+    <symbol id="i-linkedin" viewBox="0 0 24 24"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></symbol>
+    <symbol id="i-facebook" viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.49h-2.8V24C19.62 23.1 24 18.1 24 12.07Z"/></symbol>
+  </svg>
+
+  <!-- Ambient rising bubbles background -->
+  <canvas class="bg-bubbles" id="bgBubbles" aria-hidden="true"></canvas>
+
+  <!-- Scroll progress bar (2.5D rail) -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true">
+    <div class="scroll-progress__track">
+      <div class="scroll-progress__fill"></div>
+      <div class="scroll-progress__head">
+        <span class="scroll-progress__val" id="scrollProgressVal">00%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#top" class="logo" aria-label="Nguyễn Minh Trí — Home">
+        <span class="logo__mark">MT</span><span class="logo__dot"></span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="#about" class="nav__link" data-i18n="nav.about">About</a>
+        <a href="#experience" class="nav__link" data-i18n="nav.experience">Experience</a>
+        <a href="#projects" class="nav__link" data-i18n="nav.projects">Projects</a>
+        <a href="#skills" class="nav__link" data-i18n="nav.skills">Skills</a>
+        <a href="#contact" class="nav__link" data-i18n="nav.contact">Contact</a>
+      </nav>
+
+      <div class="header__actions">
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">
+          <span class="lang-toggle__opt" data-lang="en">EN</span>
+          <span class="lang-toggle__opt" data-lang="vi">VI</span>
+          <span class="lang-toggle__thumb" aria-hidden="true"></span>
+        </button>
+        <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+          <svg class="theme-toggle__sun"><use href="#i-sun"/></svg>
+          <svg class="theme-toggle__moon"><use href="#i-moon"/></svg>
+        </button>
+        <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <nav class="container mobile-menu__nav">
+      <a href="#about"><i>01</i><span data-i18n="nav.about">About</span></a>
+      <a href="#experience"><i>02</i><span data-i18n="nav.experience">Experience</span></a>
+      <a href="#projects"><i>03</i><span data-i18n="nav.projects">Projects</span></a>
+      <a href="#skills"><i>04</i><span data-i18n="nav.skills">Skills</span></a>
+      <a href="#contact"><i>05</i><span data-i18n="nav.contact">Contact</span></a>
+    </nav>
+    <div class="container mobile-menu__foot">
+      <a href="mailto:tri.nguyen.sft@gmail.com">tri.nguyen.sft@gmail.com</a>
+    </div>
+  </div>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__grid">
+        <div class="hero__content" data-depth="-10">
+          <p class="status load-in" style="--d:.05s">
+            <span class="status__dot"></span>
+            <span data-i18n="hero.status">Available for new opportunities</span>
+          </p>
+
+          <h1 class="hero__title" aria-label="Nguyễn Minh Trí">
+            <span class="mask"><span class="load-up" style="--d:.12s">Nguyễn</span></span>
+            <span class="mask"><span class="load-up" style="--d:.22s">Minh Trí<em class="accent-dot">.</em></span></span>
+          </h1>
+
+          <p class="hero__role load-in" style="--d:.38s">
+            Backend / Full-stack Developer <span class="hero__role-sep">—</span> <span class="serif">.NET &amp; Angular</span>
+          </p>
+
+          <p class="hero__intro load-in" style="--d:.46s" data-i18n="hero.intro">
+            Backend developer with 3+ years of experience designing, building and optimizing enterprise systems (ERP, HRIS) on the .NET ecosystem — strong in RESTful APIs, SQL Server query tuning, Clean Architecture and JWT/RBAC security.
+          </p>
+
+          <div class="hero__cta load-in" style="--d:.56s">
+            <a class="btn btn--primary" href="assets/Nguyen-Minh-Tri_Backend-Developer.pdf" download="Nguyen-Minh-Tri_Backend-Developer.pdf">
+              <span data-i18n="btn.cv">Download CV</span>
+              <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg><svg><use href="#i-down"/></svg></span>
+            </a>
+            <a class="btn btn--ghost" href="#projects">
+              <span data-i18n="btn.projects">View projects</span>
+              <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+            </a>
+          </div>
+
+          <ul class="hero__meta load-in" style="--d:.66s">
+            <li><span class="meta-k" data-i18n="hero.based">Based in</span><span data-i18n="hero.location">Ho Chi Minh City</span></li>
+            <li><span class="meta-k" data-i18n="hero.time">Local time</span><span><span id="clock">--:--</span> GMT+7</span></li>
+          </ul>
+        </div>
+
+        <!-- 2.5D scene -->
+        <div class="hero__visual load-in" style="--d:.3s" aria-hidden="true">
+          <div class="scene" id="scene">
+            <div class="scene__inner" id="sceneInner">
+              <div class="layer layer--plate">
+                <span class="plate__ring plate__ring--1"></span>
+                <span class="plate__ring plate__ring--2"></span>
+                <span class="plate__label">// enterprise-grade · since 2023</span>
+              </div>
+
+              <div class="layer layer--card">
+                <div class="win">
+                  <div class="win__bar">
+                    <i></i><i></i><i></i>
+                    <span>api.nexusos.local</span>
+                  </div>
+                  <div class="win__req">
+                    <b>GET</b><span>/api/v1/employees?page=1</span>
+                  </div>
+                  <div class="win__status">
+                    <span class="ok"><i></i>200 OK</span>
+                    <span class="ms">38 ms</span>
+                    <span class="sz">1.2 kB</span>
+                  </div>
+<pre class="win__code"><span class="p">{</span>
+  <span class="k">"data"</span><span class="p">: [{</span>
+    <span class="k">"id"</span><span class="p">:</span> <span class="n">1024</span><span class="p">,</span>
+    <span class="k">"name"</span><span class="p">:</span> <span class="s">"Nguyen Minh Tri"</span><span class="p">,</span>
+    <span class="k">"role"</span><span class="p">:</span> <span class="s">"Software Engineer"</span>
+  <span class="p">}],</span>
+  <span class="k">"auth"</span><span class="p">:</span> <span class="s">"JWT · RBAC"</span><span class="p">,</span>
+  <span class="k">"users"</span><span class="p">:</span> <span class="n">10000</span>
+<span class="p">}</span><span class="caret"></span></pre>
+                </div>
+              </div>
+
+              <div class="layer chip chip--1"><span><b class="c1"></b>.NET 10</span></div>
+              <div class="layer chip chip--2"><span><b class="c2"></b>Angular</span></div>
+              <div class="layer chip chip--3"><span><b class="c3"></b>SQL Server</span></div>
+              <div class="layer badge">
+                <span>
+                  <strong>−20%</strong>
+                  <small data-i18n="hero.badge">API response time</small>
+                </span>
+              </div>
+            </div>
+            <div class="scene__shadow"></div>
+          </div>
+        </div>
+      </div>
+
+      <a href="#about" class="scroll-hint" aria-label="Scroll down">
+        <span class="scroll-hint__line"></span>
+        <span data-i18n="hero.scroll">Scroll</span>
+      </a>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats" aria-label="Highlights">
+      <div class="container stats__grid">
+        <div class="stat reveal" style="--d:0s">
+          <span class="stat__num"><span data-count="3">0</span>+</span>
+          <span class="stat__label" data-i18n="stat.years">Years of experience</span>
+        </div>
+        <div class="stat reveal" style="--d:.08s">
+          <span class="stat__num"><span data-count="10000" data-format="1">0</span>+</span>
+          <span class="stat__label" data-i18n="stat.users">Active users served</span>
+        </div>
+        <div class="stat reveal" style="--d:.16s">
+          <span class="stat__num"><span data-count="6">0</span>+</span>
+          <span class="stat__label" data-i18n="stat.clients">Enterprise clients</span>
+        </div>
+        <div class="stat reveal" style="--d:.24s">
+          <span class="stat__num">~<span data-count="20">0</span>%</span>
+          <span class="stat__label" data-i18n="stat.api">Faster API response</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-label reveal"><span>01</span><span data-i18n="nav.about">About</span></p>
+          <h2 class="sec-title reveal" style="--d:.06s" data-i18n="about.title">I build backends that stay <em>calm</em> under load.</h2>
+        </div>
+
+        <div class="about__grid">
+          <div class="about__text">
+            <p class="lead reveal" data-i18n="about.p1">I'm Tri — a software engineer at EMSC, where most of my days are spent inside HR systems used by thousands of employees. I focus on the part users rarely see but always feel: clear API contracts, predictable data access and queries that stay fast as data grows.</p>
+            <p class="reveal" style="--d:.06s" data-i18n="about.p2">On the frontend I work with Angular and TypeScript, which helps me design APIs with the people who consume them in mind — and keeps the conversation between backend and frontend teams short and precise.</p>
+          </div>
+
+          <dl class="info reveal" style="--d:.1s">
+            <div class="info__row"><dt data-i18n="info.name">Full name</dt><dd>Nguyễn Minh Trí</dd></div>
+            <div class="info__row"><dt data-i18n="info.dob">Date of birth</dt><dd data-i18n="info.dobVal">17 Aug 2001</dd></div>
+            <div class="info__row"><dt data-i18n="info.loc">Location</dt><dd data-i18n="hero.location">Ho Chi Minh City</dd></div>
+            <div class="info__row"><dt>Email</dt><dd><a class="link" href="mailto:tri.nguyen.sft@gmail.com">tri.nguyen.sft@gmail.com</a></dd></div>
+            <div class="info__row"><dt data-i18n="info.phone">Phone</dt><dd><a class="link" href="tel:+84962643027">0962 643 027</a></dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section class="section" id="experience">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-label reveal"><span>02</span><span data-i18n="nav.experience">Experience</span></p>
+          <h2 class="sec-title reveal" style="--d:.06s" data-i18n="exp.title">Where I've been <em>shipping</em>.</h2>
+        </div>
+
+        <article class="job reveal-3d">
+          <div class="job__side">
+            <span class="job__period" data-i18n="exp.period">2023 — Present</span>
+            <span class="job__now"><i></i><span data-i18n="exp.now">Current role</span></span>
+          </div>
+          <div class="job__main">
+            <h3 class="job__role">Software Engineer</h3>
+            <p class="job__company">Enterprise Management Software Corporation <span>(EMSC)</span></p>
+            <ul class="job__list">
+              <li data-i18n="exp.b1">Develop and maintain HRIS modules deployed for large enterprise clients, reliably serving <strong>10,000+ active users</strong>.</li>
+              <li data-i18n="exp.b2">Design RESTful APIs, optimize Entity Framework &amp; LINQ queries and restructure SQL Server indexes — improving API response time by <strong>~20%</strong>.</li>
+              <li data-i18n="exp.b3">Work with the frontend team to align API contracts, refactor legacy code and manage source code on Azure DevOps Server.</li>
+            </ul>
+            <div class="job__clients">
+              <span class="job__clients-k" data-i18n="exp.clients">Clients</span>
+              <ul class="tags">
+                <li>Aeon Delight</li><li>Transimex</li><li>Coteccons</li><li>BM Windows</li><li>TMI Vietnam</li><li>SaSin</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="sec-head sec-head--split">
+          <div>
+            <p class="sec-label reveal"><span>03</span><span data-i18n="nav.projects">Projects</span></p>
+            <h2 class="sec-title reveal" style="--d:.06s" data-i18n="proj.title">Selected <em>work</em>.</h2>
+          </div>
+          <p class="sec-sub reveal" style="--d:.12s" data-i18n="proj.sub">Personal projects where I explore enterprise architecture end to end — from database design to the API and the UI on top.</p>
+        </div>
+
+        <div class="projects">
+          <!-- 01 -->
+          <div class="project-wrap project-wrap--wide reveal-3d">
+            <article class="project tilt">
+              <div class="project__glare"></div>
+              <div class="project__body">
+                <div class="project__top">
+                  <span class="project__idx">01</span>
+                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                </div>
+                <h3 class="project__title">NexusOS Backend</h3>
+                <p class="project__sub" data-i18n="p1.sub">.NET Core ERP &amp; HRM API</p>
+                <p class="project__desc" data-i18n="p1.desc">Modular REST API for an ERP &amp; HRM platform — covering core HR, organization structure and access control, organised with Clean Architecture and secured with JWT and role-based authorization.</p>
+                <ul class="tags"><li>ASP.NET Core</li><li>EF Core</li><li>SQL Server</li><li>JWT</li><li>Clean Architecture</li></ul>
+                <div class="project__actions">
+                  <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NexusOS_Net" target="_blank" rel="noopener">
+                    <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- 02 -->
+          <div class="project-wrap reveal-3d">
+            <article class="project tilt">
+              <div class="project__glare"></div>
+              <div class="project__body">
+                <div class="project__top">
+                  <span class="project__idx">02</span>
+                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                </div>
+                <h3 class="project__title">NexusOS Frontend</h3>
+                <p class="project__sub" data-i18n="p2.sub">Angular Enterprise Portal</p>
+                <p class="project__desc" data-i18n="p2.desc">Enterprise portal built with Angular on top of the NexusOS API — feature-based modules, strongly typed services and a consistent interface for everyday HR operations.</p>
+                <ul class="tags"><li>Angular</li><li>TypeScript</li><li>SCSS</li><li>REST</li></ul>
+                <div class="project__actions">
+                  <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NexusOS_Angular" target="_blank" rel="noopener">
+                    <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- 03 -->
+          <div class="project-wrap reveal-3d" style="--d:.08s">
+            <article class="project tilt">
+              <div class="project__glare"></div>
+              <div class="project__body">
+                <div class="project__top">
+                  <span class="project__idx">03</span>
+                  <span class="pill pill--live"><i></i><span data-i18n="proj.live">Live</span></span>
+                </div>
+                <h3 class="project__title">English Dictionary</h3>
+                <p class="project__sub" data-i18n="p3.sub">Dictionary &amp; Flashcard Vault</p>
+                <p class="project__desc" data-i18n="p3.desc">A lightweight web app to look up English words and save them into personal flashcard decks for later review — fast, simple and running entirely in the browser.</p>
+                <ul class="tags"><li>JavaScript</li><li>HTML5</li><li>CSS3</li><li>GitHub Pages</li></ul>
+                <div class="project__actions">
+                  <a class="btn btn--sm btn--primary" href="https://minh-tri-17.github.io/English_Dictionary/" target="_blank" rel="noopener">
+                    <span data-i18n="btn.demo">Live demo</span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                  </a>
+                  <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/English_Dictionary" target="_blank" rel="noopener">
+                    <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- 04 -->
+          <div class="project-wrap reveal-3d">
+            <article class="project tilt">
+              <div class="project__glare"></div>
+              <div class="project__body">
+                <div class="project__top">
+                  <span class="project__idx">04</span>
+                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                </div>
+                <h3 class="project__title">NextERP</h3>
+                <p class="project__sub" data-i18n="p4.sub">Enterprise Resource Planning System</p>
+                <p class="project__desc" data-i18n="p4.desc">ERP system on .NET 10 following Clean Architecture, with EF Core &amp; SQL Server for persistence, JWT authentication and SMTP email notifications.</p>
+                <ul class="tags"><li>.NET 10</li><li>EF Core</li><li>SQL Server</li><li>JWT</li><li>SMTP</li></ul>
+                <div class="project__actions">
+                  <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NextERP" target="_blank" rel="noopener">
+                    <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- 05 -->
+          <div class="project-wrap reveal-3d" style="--d:.08s">
+            <article class="project tilt">
+              <div class="project__glare"></div>
+              <div class="project__body">
+                <div class="project__top">
+                  <span class="project__idx">05</span>
+                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                </div>
+                <h3 class="project__title">ZenOSBE</h3>
+                <p class="project__sub" data-i18n="p5.sub">Modular Backend API System</p>
+                <p class="project__desc" data-i18n="p5.desc">Modular backend API with a classic layered design — API, BLL, DAL and Util projects — built on ASP.NET Core Web API, EF Core, SQL Server and JWT.</p>
+                <ul class="tags"><li>ASP.NET Core</li><li>API · BLL · DAL</li><li>EF Core</li><li>SQL Server</li><li>JWT</li></ul>
+                <div class="project__actions">
+                  <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/ZenOSBE" target="_blank" rel="noopener">
+                    <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="projects__more reveal">
+          <a class="link link--arrow" href="https://github.com/Minh-Tri-17" target="_blank" rel="noopener">
+            <span data-i18n="proj.more">More on GitHub</span><svg><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS ============ -->
+    <section class="section" id="skills">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-label reveal"><span>04</span><span data-i18n="nav.skills">Skills</span></p>
+          <h2 class="sec-title reveal" style="--d:.06s" data-i18n="skills.title">The <em>toolkit</em>.</h2>
+        </div>
+
+        <div class="skills">
+          <div class="skill reveal">
+            <h3 class="skill__name"><span class="skill__no">a.</span>Backend</h3>
+            <ul class="tags tags--lg"><li>C#</li><li>.NET Core (8 / 9 / 10)</li><li>.NET Framework</li><li>ASP.NET MVC</li><li>ASP.NET Core Web API</li><li>RESTful APIs</li><li>OOP</li></ul>
+          </div>
+          <div class="skill reveal">
+            <h3 class="skill__name"><span class="skill__no">b.</span><span data-i18n="sk.db">Database &amp; Caching</span></h3>
+            <ul class="tags tags--lg"><li>SQL Server</li><li>Entity Framework Core</li><li>LINQ</li><li>Query Optimization</li><li>Redis</li></ul>
+          </div>
+          <div class="skill reveal">
+            <h3 class="skill__name"><span class="skill__no">c.</span><span data-i18n="sk.arch">Architecture &amp; Security</span></h3>
+            <ul class="tags tags--lg"><li>Clean Architecture</li><li>Layered Architecture</li><li>Repository Pattern</li><li>Dependency Injection</li><li>JWT</li><li>Role-based Authorization</li></ul>
+          </div>
+          <div class="skill reveal">
+            <h3 class="skill__name"><span class="skill__no">d.</span>Frontend</h3>
+            <ul class="tags tags--lg"><li>Angular</li><li>TypeScript</li><li>HTML5</li><li>CSS3</li><li>SCSS</li><li>JavaScript (ES6)</li><li>Bootstrap</li></ul>
+          </div>
+          <div class="skill reveal">
+            <h3 class="skill__name"><span class="skill__no">e.</span><span data-i18n="sk.tools">Tools &amp; DevOps</span></h3>
+            <ul class="tags tags--lg"><li>Azure DevOps Server</li><li>Git</li><li>Docker</li><li>IIS</li></ul>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="edu reveal-3d">
+          <div class="edu__label">
+            <span class="sec-label sec-label--inline"><span>05</span><span data-i18n="edu.label">Education</span></span>
+          </div>
+          <div class="edu__main">
+            <h3 class="edu__school" data-i18n="edu.school">Nam Can Tho University</h3>
+            <p class="edu__degree" data-i18n="edu.degree">Engineer's Degree in Information Technology</p>
+          </div>
+          <div class="edu__side">
+            <span class="edu__period">2019 — 2023</span>
+            <span class="edu__gpa">GPA <strong>8.0</strong><small>/10</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section contact" id="contact">
+      <div class="container">
+        <p class="sec-label reveal"><span>06</span><span data-i18n="nav.contact">Contact</span></p>
+        <h2 class="contact__title reveal" style="--d:.06s" data-i18n="contact.title">Let's build something <em>reliable</em>.</h2>
+        <p class="contact__text reveal" style="--d:.12s" data-i18n="contact.text">Open to backend and full-stack roles. The quickest way to reach me is email — I usually reply within a day.</p>
+
+        <div class="contact__mail reveal" style="--d:.18s">
+          <a class="contact__email" href="mailto:tri.nguyen.sft@gmail.com">tri.nguyen.sft@gmail.com</a>
+          <button class="icon-btn copy-btn" id="copyEmail" type="button" data-email="tri.nguyen.sft@gmail.com" aria-label="Copy email">
+            <svg><use href="#i-copy"/></svg>
+          </button>
+        </div>
+
+        <div class="contact__grid reveal" style="--d:.24s">
+          <a class="contact__item" href="tel:+84962643027">
+            <span class="contact__k" data-i18n="info.phone">Phone</span>
+            <span class="contact__v">0962 643 027</span>
+          </a>
+          <a class="contact__item" href="https://github.com/Minh-Tri-17" target="_blank" rel="noopener">
+            <span class="contact__k">GitHub</span>
+            <span class="contact__v"><svg><use href="#i-github"/></svg>Minh-Tri-17<svg class="contact__arr"><use href="#i-arrow"/></svg></span>
+          </a>
+          <a class="contact__item" href="https://www.linkedin.com/in/tr%C3%AD-nguy%E1%BB%85n-2b11b33b1/" target="_blank" rel="noopener">
+            <span class="contact__k">LinkedIn</span>
+            <span class="contact__v"><svg><use href="#i-linkedin"/></svg>Trí Nguyễn<svg class="contact__arr"><use href="#i-arrow"/></svg></span>
+          </a>
+          <a class="contact__item" href="https://www.facebook.com/minhtri8552" target="_blank" rel="noopener">
+            <span class="contact__k">Facebook</span>
+            <span class="contact__v"><svg><use href="#i-facebook"/></svg>minhtri8552<svg class="contact__arr"><use href="#i-arrow"/></svg></span>
+          </a>
+        </div>
+
+        <div class="contact__cta reveal" style="--d:.3s">
+          <a class="btn btn--primary" href="assets/Nguyen-Minh-Tri_Backend-Developer.pdf" download="Nguyen-Minh-Tri_Backend-Developer.pdf">
+            <span data-i18n="btn.cv">Download CV</span>
+            <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg><svg><use href="#i-down"/></svg></span>
+          </a>
+          <a class="btn btn--ghost" href="mailto:tri.nguyen.sft@gmail.com">
+            <span data-i18n="btn.mail">Send an email</span>
+            <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year">2026</span> Nguyễn Minh Trí</p>
+      <p class="footer__note" data-i18n="footer.note">Designed &amp; built with plain HTML, CSS and JavaScript.</p>
+      <a href="#top" class="link link--arrow footer__top"><span data-i18n="footer.top">Back to top</span><svg><use href="#i-arrow"/></svg></a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
