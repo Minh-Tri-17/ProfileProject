@@ -77,9 +77,24 @@
     'p5.desc': 'Backend API dạng module theo kiến trúc phân lớp — API, BLL, DAL và Util — xây dựng trên ASP.NET Core Web API, EF Core, SQL Server và JWT.',
 
     'skills.title': 'Bộ <em>công cụ</em>.',
+    'sk.be': 'Backend &amp; Kiến trúc',
     'sk.db': 'Cơ sở dữ liệu &amp; Caching',
-    'sk.arch': 'Kiến trúc &amp; Bảo mật',
     'sk.tools': 'Công cụ &amp; DevOps',
+    'tk.dotnet': 'API cốt lõi · .NET 8/9/10 &amp; Framework',
+    'tk.aspnet': 'Web API, MVC &amp; Dịch vụ RESTful',
+    'tk.clean': 'Phân lớp, Repository &amp; DI Pattern',
+    'tk.jwt': 'Xác thực Token &amp; Phân quyền vai trò',
+    'tk.sql': 'Thiết kế CSDL, Index &amp; Tối ưu truy vấn',
+    'tk.ef': 'ORM, Migration &amp; Truy xuất dữ liệu',
+    'tk.redis': 'Caching &amp; Lưu trữ Session',
+    'tk.angular': 'Ứng dụng SPA &amp; Portal doanh nghiệp',
+    'tk.ts': 'Logic Frontend định kiểu chặt chẽ',
+    'tk.js': 'Tương tác Web &amp; DOM hiện đại',
+    'tk.ui': 'Giao diện Responsive &amp; Bootstrap',
+    'tk.azure': 'Quản lý Source &amp; Quy trình nhóm',
+    'tk.docker': 'Đóng gói Container &amp; Môi trường',
+    'tk.git': 'Quản lý nhánh &amp; Review mã nguồn',
+    'tk.iis': 'Triển khai Web Server Windows',
 
     'edu.label': 'Học vấn',
     'edu.school': 'Đại học Nam Cần Thơ',
@@ -155,14 +170,18 @@
   });
 
   /* -------------------------------------------------------
-     Header: scrolled state + hide on scroll down + 2.5D progress rail
+     Header: scrolled state + hide on scroll down + 2.5D Request/Response scroll
      ------------------------------------------------------- */
   const header = $('#header');
   const scrollProgress = $('#scrollProgress');
   const scrollProgressVal = $('#scrollProgressVal');
+  const watermarks = $$('[data-parallax-num]');
   let lastY = scrollY;
   let scrollIdleTimer = 0;
-  const onHeaderScroll = () => {
+  let resFired = false;
+  let resClearTimer = 0;
+
+  const updateScrollEffects = () => {
     const y = scrollY;
     const dy = y - lastY;
     header.classList.toggle('is-scrolled', y > 12);
@@ -174,12 +193,31 @@
     if (scrollProgress) {
       const maxScroll = root.scrollHeight - innerHeight;
       const p = maxScroll > 0 ? Math.min(Math.max(y / maxScroll, 0), 1) : 0;
-      const vel = Math.max(-8, Math.min(8, -dy * 0.18));
+      const vel = Math.max(-7, Math.min(7, -dy * 0.16));
+      const pct = Math.round(p * 100);
       scrollProgress.style.setProperty('--scroll-p', p.toFixed(4));
       scrollProgress.style.setProperty('--vel', `${vel.toFixed(1)}px`);
       scrollProgress.style.setProperty('--val-o', y > 20 ? '1' : '0');
+      scrollProgress.classList.toggle('is-active', y > 20);
+      scrollProgress.classList.toggle('is-done', pct >= 98);
+
+      // Fire green Response packet from 200 -> REQ once when reaching bottom
+      if (pct >= 98 && !resFired) {
+        resFired = true;
+        scrollProgress.classList.remove('is-responding');
+        void scrollProgress.offsetWidth;
+        scrollProgress.classList.add('is-responding');
+        clearTimeout(resClearTimer);
+        resClearTimer = setTimeout(() => {
+          scrollProgress.classList.remove('is-responding');
+        }, 1100);
+      } else if (pct < 92) {
+        resFired = false;
+      }
+
       if (scrollProgressVal) {
-        scrollProgressVal.textContent = `${String(Math.round(p * 100)).padStart(2, '0')}%`;
+        const prefix = pct >= 98 ? '200' : 'REQ';
+        scrollProgressVal.textContent = `${prefix} · ${String(pct).padStart(2, '0')}%`;
       }
       clearTimeout(scrollIdleTimer);
       scrollIdleTimer = setTimeout(() => {
@@ -187,15 +225,48 @@
         scrollProgress.style.setProperty('--val-o', '0');
       }, 650);
     }
+
+    // Background watermark numerals depth scroll parallax (2-layer depth)
+    if (!reduceMotion && watermarks.length) {
+      const vh = innerHeight;
+      for (let i = 0; i < watermarks.length; i++) {
+        const wm = watermarks[i];
+        const sec = wm.parentElement;
+        if (!sec) continue;
+        const r = sec.getBoundingClientRect();
+        if (r.bottom < -120 || r.top > vh + 120) continue;
+        const delta = (vh * 0.5 - (r.top + r.height * 0.35)) * 0.22;
+        const shift = Math.max(-110, Math.min(110, delta));
+        wm.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`;
+      }
+    }
   };
+  const onHeaderScroll = updateScrollEffects;
 
   if (finePointer && !reduceMotion && scrollProgress) {
+    let spTx = 0, spTy = 4, spCx = 0, spCy = 4, spRaf = 0;
+    const tickRail = () => {
+      spCx += (spTx - spCx) * 0.09;
+      spCy += (spTy - spCy) * 0.09;
+      scrollProgress.style.setProperty('--tilt-x', `${spCx.toFixed(2)}deg`);
+      scrollProgress.style.setProperty('--tilt-y', `${spCy.toFixed(2)}deg`);
+      if (Math.abs(spTx - spCx) > 0.01 || Math.abs(spTy - spCy) > 0.01) {
+        spRaf = requestAnimationFrame(tickRail);
+      } else {
+        spRaf = 0;
+      }
+    };
     addEventListener('pointermove', (e) => {
       const nx = e.clientX / innerWidth - 0.5;
       const ny = e.clientY / innerHeight - 0.5;
-      scrollProgress.style.setProperty('--tilt-x', `${(-ny * 14).toFixed(2)}deg`);
-      scrollProgress.style.setProperty('--tilt-y', `${(12 + nx * 14).toFixed(2)}deg`);
+      spTx = -ny * 8;         // max ±4°
+      spTy = 4 + nx * 8;      // 0° to 8°
+      if (!spRaf) spRaf = requestAnimationFrame(tickRail);
     }, { passive: true });
+    document.addEventListener('pointerleave', () => {
+      spTx = 0; spTy = 4;
+      if (!spRaf) spRaf = requestAnimationFrame(tickRail);
+    });
   }
 
   /* Mobile menu */
@@ -273,19 +344,19 @@
   const heroLoop = (t) => {
     if (heroVisible && !reduceMotion) {
       if (!finePointer) { // gentle idle drift on touch devices
-        tx = Math.sin(t / 2600) * 0.35;
-        ty = Math.cos(t / 3400) * 0.25;
+        tx = Math.sin(t / 2600) * 0.3;
+        ty = Math.cos(t / 3400) * 0.22;
       }
-      cx += (tx - cx) * 0.06;
-      cy += (ty - cy) * 0.06;
+      cx += (tx - cx) * 0.08;
+      cy += (ty - cy) * 0.08;
       const sp = Math.min(scrollY / (hero.offsetHeight || innerHeight), 1);
-      const rx = -cy * 14 + sp * 16 + 4;
-      const ry = cx * 20 - 8;
+      const rx = Math.max(-7.5, Math.min(7.5, -cy * 10 + sp * 4 + 1.5));
+      const ry = Math.max(-7.5, Math.min(7.5, cx * 12 - 2));
       sceneInner.style.transform =
-        `translate3d(0, ${(sp * 40).toFixed(1)}px, ${(-sp * 160).toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+        `translate3d(0, ${(sp * 36).toFixed(1)}px, ${(-sp * 110).toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
       depthEls.forEach((el) => {
         const d = +el.dataset.depth;
-        el.style.translate = `${(cx * d).toFixed(2)}px ${(cy * d - sp * 60).toFixed(2)}px`;
+        el.style.translate = `${(cx * d).toFixed(2)}px ${(cy * d - sp * 52).toFixed(2)}px`;
       });
     }
     requestAnimationFrame(heroLoop);
@@ -293,33 +364,108 @@
   requestAnimationFrame(heroLoop);
 
   /* -------------------------------------------------------
-     Project cards — 3D tilt with glare
+     Project cards — Window Depth Effect with Lerp (0.09) in rAF
      ------------------------------------------------------- */
   if (finePointer && !reduceMotion) {
+    const CARD_LERP = 0.09;
     $$('.tilt').forEach((card) => {
+      let tx = 0, ty = 0, cx = 0, cy = 0;
+      let tgx = 50, tgy = 50, cgx = 50, cgy = 50;
+      let maxTilt = 2.5;
       let raf = 0;
-      card.addEventListener('pointerenter', () => card.classList.add('is-hover'));
+
+      const tickCard = () => {
+        cx += (tx - cx) * CARD_LERP;
+        cy += (ty - cy) * CARD_LERP;
+        cgx += (tgx - cgx) * CARD_LERP;
+        cgy += (tgy - cgy) * CARD_LERP;
+
+        card.style.setProperty('--rx', `${(-cy * maxTilt * 2).toFixed(2)}deg`);
+        card.style.setProperty('--ry', `${(cx * maxTilt * 2).toFixed(2)}deg`);
+        card.style.setProperty('--px', cx.toFixed(4));
+        card.style.setProperty('--py', cy.toFixed(4));
+        card.style.setProperty('--gx', `${cgx.toFixed(1)}%`);
+        card.style.setProperty('--gy', `${cgy.toFixed(1)}%`);
+
+        const settled =
+          Math.abs(tx - cx) < 0.0006 &&
+          Math.abs(ty - cy) < 0.0006 &&
+          Math.abs(tgx - cgx) < 0.08 &&
+          Math.abs(tgy - cgy) < 0.08;
+
+        if (!settled) {
+          raf = requestAnimationFrame(tickCard);
+        } else {
+          raf = 0;
+        }
+      };
+
+      const wake = () => { if (!raf) raf = requestAnimationFrame(tickCard); };
+
+      card.addEventListener('pointerenter', () => {
+        card.classList.add('is-hover');
+        maxTilt = card.offsetWidth > 700 ? 1.5 : 2.5;
+      });
       card.addEventListener('pointermove', (e) => {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width;
-          const y = (e.clientY - r.top) / r.height;
-          const k = r.width > 700 ? 0.5 : 1; // softer tilt on wide cards
-          card.style.setProperty('--rx', `${((0.5 - y) * 8 * k).toFixed(2)}deg`);
-          card.style.setProperty('--ry', `${((x - 0.5) * 10 * k).toFixed(2)}deg`);
-          card.style.setProperty('--gx', `${(x * 100).toFixed(1)}%`);
-          card.style.setProperty('--gy', `${(y * 100).toFixed(1)}%`);
-        });
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        tx = x - 0.5;
+        ty = y - 0.5;
+        tgx = x * 100;
+        tgy = y * 100;
+        wake();
       });
       card.addEventListener('pointerleave', () => {
-        cancelAnimationFrame(raf);
         card.classList.remove('is-hover');
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
+        tx = 0; ty = 0;
+        tgx = 50; tgy = 50;
+        wake();
       });
     });
   }
+
+  /* -------------------------------------------------------
+     Buttons — Inject Liquid Wave + Rising Bubbles layers
+     ------------------------------------------------------- */
+  (() => {
+    const WAVE_SVG =
+      '<svg class="btn__wave btn__wave--back" viewBox="0 0 240 80" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path fill="currentColor" d="M0,12 C30,2 60,22 120,12 C180,2 210,22 240,12 L240,80 L0,80 Z"/>' +
+      '</svg>' +
+      '<svg class="btn__wave btn__wave--front" viewBox="0 0 240 80" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path fill="currentColor" d="M0,16 C40,26 80,6 120,16 C160,26 200,6 240,16 L240,80 L0,80 Z"/>' +
+      '</svg>';
+
+    // 6 organic bubbles per button: [left%, sizePx, durationSec, delaySec, wobblePx]
+    const BUBBLES = [
+      [14, 4, 2.7, -0.4,  4],
+      [29, 6, 3.6, -1.9, -5],
+      [46, 3.5, 2.4, -1.1, 3],
+      [62, 7, 4.0, -2.8, -4],
+      [76, 4.5, 3.1, -0.7, 5],
+      [88, 3, 2.5, -2.1, -3],
+    ];
+
+    const bubblesHTML = BUBBLES.map(([x, s, d, del, w]) =>
+      `<i style="--bx:${x}%;--bs:${s}px;--bd:${d}s;--bdel:${del}s;--bw:${w}px"></i>`
+    ).join('');
+
+    $$('.btn').forEach((btn) => {
+      if (btn.querySelector('.btn__liquid')) return;
+      const liquid = document.createElement('span');
+      liquid.className = 'btn__liquid';
+      liquid.setAttribute('aria-hidden', 'true');
+      liquid.innerHTML = WAVE_SVG;
+
+      const bubbles = document.createElement('span');
+      bubbles.className = 'btn__bubbles';
+      bubbles.setAttribute('aria-hidden', 'true');
+      bubbles.innerHTML = bubblesHTML;
+
+      btn.prepend(liquid, bubbles);
+    });
+  })();
 
   /* -------------------------------------------------------
      Scroll handler (rAF-throttled)
@@ -609,8 +755,8 @@
     let curRotX = 0, curRotY = 0;
 
     const MAX_EYE_OFFSET = 5.4; // SVG units clamp inside visor screen
-    const MAX_HEAD_TILT = 18;   // Degrees for 2.5D perspective tilt
-    const LERP = 0.1;           // Smooth 60fps linear interpolation factor
+    const MAX_HEAD_TILT = 8;    // Restrained ±8° 2.5D tilt
+    const LERP = 0.09;          // Smooth 60fps linear interpolation factor
 
     addEventListener('pointermove', (e) => {
       const rect = btn.getBoundingClientRect();

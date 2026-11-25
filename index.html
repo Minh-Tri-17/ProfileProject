@@ -44,14 +44,17 @@
   <!-- Ambient rising bubbles background -->
   <canvas class="bg-bubbles" id="bgBubbles" aria-hidden="true"></canvas>
 
-  <!-- Scroll progress bar (2.5D rail) -->
+  <!-- Scroll progress: 2.5D Request / Response pipeline -->
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true">
+    <span class="scroll-progress__node scroll-progress__node--top">REQ</span>
     <div class="scroll-progress__track">
       <div class="scroll-progress__fill"></div>
-      <div class="scroll-progress__head">
-        <span class="scroll-progress__val" id="scrollProgressVal">00%</span>
+      <div class="scroll-progress__packet scroll-progress__packet--req">
+        <span class="scroll-progress__val" id="scrollProgressVal">REQ · 00%</span>
       </div>
+      <div class="scroll-progress__packet scroll-progress__packet--res"></div>
     </div>
+    <span class="scroll-progress__node scroll-progress__node--bot">200</span>
   </div>
 
   <!-- ============ HEADER ============ -->
@@ -127,11 +130,11 @@
           <div class="hero__cta load-in" style="--d:.56s">
             <a class="btn btn--primary" href="assets/Nguyen-Minh-Tri_Backend-Developer.pdf" download="Nguyen-Minh-Tri_Backend-Developer.pdf">
               <span data-i18n="btn.cv">Download CV</span>
-              <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg><svg><use href="#i-down"/></svg></span>
+              <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg></span>
             </a>
             <a class="btn btn--ghost" href="#projects">
               <span data-i18n="btn.projects">View projects</span>
-              <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+              <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
             </a>
           </div>
 
@@ -222,6 +225,7 @@
 
     <!-- ============ ABOUT ============ -->
     <section class="section" id="about">
+      <span class="sec-watermark" data-parallax-num aria-hidden="true">01</span>
       <div class="container">
         <div class="sec-head">
           <p class="sec-label reveal"><span>01</span><span data-i18n="nav.about">About</span></p>
@@ -247,6 +251,7 @@
 
     <!-- ============ EXPERIENCE ============ -->
     <section class="section" id="experience">
+      <span class="sec-watermark" data-parallax-num aria-hidden="true">02</span>
       <div class="container">
         <div class="sec-head">
           <p class="sec-label reveal"><span>02</span><span data-i18n="nav.experience">Experience</span></p>
@@ -279,6 +284,7 @@
 
     <!-- ============ PROJECTS ============ -->
     <section class="section" id="projects">
+      <span class="sec-watermark" data-parallax-num aria-hidden="true">03</span>
       <div class="container">
         <div class="sec-head sec-head--split">
           <div>
@@ -292,12 +298,23 @@
           <!-- 01 -->
           <div class="project-wrap project-wrap--wide reveal-3d">
             <article class="project tilt">
-              <div class="project__glare"></div>
-              <div class="project__body">
-                <div class="project__top">
-                  <span class="project__idx">01</span>
-                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+              <div class="project__window">
+                <div class="project__win-scene">
+                  <div class="project__win-grid" aria-hidden="true"></div>
+                  <div class="project__win-title" aria-hidden="true">NEXUSOS</div>
+                  <div class="project__win-float">
+                    <div class="project__win-row">
+                      <span class="win-badge win-badge--idx">01</span>
+                      <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                    </div>
+                    <div class="project__win-row project__win-row--end">
+                      <span class="win-badge win-badge--tech"><b></b>ASP.NET Core · Clean Arch</span>
+                    </div>
+                  </div>
                 </div>
+                <div class="project__win-glare" aria-hidden="true"></div>
+              </div>
+              <div class="project__body">
                 <h3 class="project__title">NexusOS Backend</h3>
                 <p class="project__sub" data-i18n="p1.sub">.NET Core ERP &amp; HRM API</p>
                 <p class="project__desc" data-i18n="p1.desc">Modular REST API for an ERP &amp; HRM platform — covering core HR, organization structure and access control, organised with Clean Architecture and secured with JWT and role-based authorization.</p>
@@ -305,7 +322,7 @@
                 <div class="project__actions">
                   <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NexusOS_Net" target="_blank" rel="noopener">
                     <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
-                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
                   </a>
                 </div>
               </div>
@@ -315,12 +332,23 @@
           <!-- 02 -->
           <div class="project-wrap reveal-3d">
             <article class="project tilt">
-              <div class="project__glare"></div>
-              <div class="project__body">
-                <div class="project__top">
-                  <span class="project__idx">02</span>
-                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+              <div class="project__window">
+                <div class="project__win-scene">
+                  <div class="project__win-grid" aria-hidden="true"></div>
+                  <div class="project__win-title" aria-hidden="true">PORTAL</div>
+                  <div class="project__win-float">
+                    <div class="project__win-row">
+                      <span class="win-badge win-badge--idx">02</span>
+                      <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                    </div>
+                    <div class="project__win-row project__win-row--end">
+                      <span class="win-badge win-badge--tech"><b></b>Angular · TypeScript</span>
+                    </div>
+                  </div>
                 </div>
+                <div class="project__win-glare" aria-hidden="true"></div>
+              </div>
+              <div class="project__body">
                 <h3 class="project__title">NexusOS Frontend</h3>
                 <p class="project__sub" data-i18n="p2.sub">Angular Enterprise Portal</p>
                 <p class="project__desc" data-i18n="p2.desc">Enterprise portal built with Angular on top of the NexusOS API — feature-based modules, strongly typed services and a consistent interface for everyday HR operations.</p>
@@ -328,7 +356,7 @@
                 <div class="project__actions">
                   <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NexusOS_Angular" target="_blank" rel="noopener">
                     <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
-                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
                   </a>
                 </div>
               </div>
@@ -338,12 +366,23 @@
           <!-- 03 -->
           <div class="project-wrap reveal-3d" style="--d:.08s">
             <article class="project tilt">
-              <div class="project__glare"></div>
-              <div class="project__body">
-                <div class="project__top">
-                  <span class="project__idx">03</span>
-                  <span class="pill pill--live"><i></i><span data-i18n="proj.live">Live</span></span>
+              <div class="project__window">
+                <div class="project__win-scene">
+                  <div class="project__win-grid" aria-hidden="true"></div>
+                  <div class="project__win-title" aria-hidden="true">VAULT</div>
+                  <div class="project__win-float">
+                    <div class="project__win-row">
+                      <span class="win-badge win-badge--idx">03</span>
+                      <span class="pill pill--live"><i></i><span data-i18n="proj.live">Live</span></span>
+                    </div>
+                    <div class="project__win-row project__win-row--end">
+                      <span class="win-badge win-badge--tech win-badge--live"><b></b>JavaScript · Flashcards</span>
+                    </div>
+                  </div>
                 </div>
+                <div class="project__win-glare" aria-hidden="true"></div>
+              </div>
+              <div class="project__body">
                 <h3 class="project__title">English Dictionary</h3>
                 <p class="project__sub" data-i18n="p3.sub">Dictionary &amp; Flashcard Vault</p>
                 <p class="project__desc" data-i18n="p3.desc">A lightweight web app to look up English words and save them into personal flashcard decks for later review — fast, simple and running entirely in the browser.</p>
@@ -351,7 +390,7 @@
                 <div class="project__actions">
                   <a class="btn btn--sm btn--primary" href="https://minh-tri-17.github.io/English_Dictionary/" target="_blank" rel="noopener">
                     <span data-i18n="btn.demo">Live demo</span>
-                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
                   </a>
                   <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/English_Dictionary" target="_blank" rel="noopener">
                     <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
@@ -364,12 +403,23 @@
           <!-- 04 -->
           <div class="project-wrap reveal-3d">
             <article class="project tilt">
-              <div class="project__glare"></div>
-              <div class="project__body">
-                <div class="project__top">
-                  <span class="project__idx">04</span>
-                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+              <div class="project__window">
+                <div class="project__win-scene">
+                  <div class="project__win-grid" aria-hidden="true"></div>
+                  <div class="project__win-title" aria-hidden="true">NEXTERP</div>
+                  <div class="project__win-float">
+                    <div class="project__win-row">
+                      <span class="win-badge win-badge--idx">04</span>
+                      <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                    </div>
+                    <div class="project__win-row project__win-row--end">
+                      <span class="win-badge win-badge--tech"><b></b>.NET 10 · SQL Server</span>
+                    </div>
+                  </div>
                 </div>
+                <div class="project__win-glare" aria-hidden="true"></div>
+              </div>
+              <div class="project__body">
                 <h3 class="project__title">NextERP</h3>
                 <p class="project__sub" data-i18n="p4.sub">Enterprise Resource Planning System</p>
                 <p class="project__desc" data-i18n="p4.desc">ERP system on .NET 10 following Clean Architecture, with EF Core &amp; SQL Server for persistence, JWT authentication and SMTP email notifications.</p>
@@ -377,7 +427,7 @@
                 <div class="project__actions">
                   <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/NextERP" target="_blank" rel="noopener">
                     <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
-                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
                   </a>
                 </div>
               </div>
@@ -387,12 +437,23 @@
           <!-- 05 -->
           <div class="project-wrap reveal-3d" style="--d:.08s">
             <article class="project tilt">
-              <div class="project__glare"></div>
-              <div class="project__body">
-                <div class="project__top">
-                  <span class="project__idx">05</span>
-                  <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+              <div class="project__window">
+                <div class="project__win-scene">
+                  <div class="project__win-grid" aria-hidden="true"></div>
+                  <div class="project__win-title" aria-hidden="true">ZENOSBE</div>
+                  <div class="project__win-float">
+                    <div class="project__win-row">
+                      <span class="win-badge win-badge--idx">05</span>
+                      <span class="pill"><i></i><span data-i18n="proj.source">Source</span></span>
+                    </div>
+                    <div class="project__win-row project__win-row--end">
+                      <span class="win-badge win-badge--tech"><b></b>API · BLL · DAL</span>
+                    </div>
+                  </div>
                 </div>
+                <div class="project__win-glare" aria-hidden="true"></div>
+              </div>
+              <div class="project__body">
                 <h3 class="project__title">ZenOSBE</h3>
                 <p class="project__sub" data-i18n="p5.sub">Modular Backend API System</p>
                 <p class="project__desc" data-i18n="p5.desc">Modular backend API with a classic layered design — API, BLL, DAL and Util projects — built on ASP.NET Core Web API, EF Core, SQL Server and JWT.</p>
@@ -400,7 +461,7 @@
                 <div class="project__actions">
                   <a class="btn btn--sm btn--ghost" href="https://github.com/Minh-Tri-17/ZenOSBE" target="_blank" rel="noopener">
                     <svg class="btn__lead"><use href="#i-github"/></svg><span data-i18n="btn.code">Source code</span>
-                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+                    <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
                   </a>
                 </div>
               </div>
@@ -418,32 +479,186 @@
 
     <!-- ============ SKILLS ============ -->
     <section class="section" id="skills">
+      <span class="sec-watermark" data-parallax-num aria-hidden="true">04</span>
       <div class="container">
         <div class="sec-head">
           <p class="sec-label reveal"><span>04</span><span data-i18n="nav.skills">Skills</span></p>
           <h2 class="sec-title reveal" style="--d:.06s" data-i18n="skills.title">The <em>toolkit</em>.</h2>
         </div>
 
-        <div class="skills">
-          <div class="skill reveal">
-            <h3 class="skill__name"><span class="skill__no">a.</span>Backend</h3>
-            <ul class="tags tags--lg"><li>C#</li><li>.NET Core (8 / 9 / 10)</li><li>.NET Framework</li><li>ASP.NET MVC</li><li>ASP.NET Core Web API</li><li>RESTful APIs</li><li>OOP</li></ul>
+        <div class="toolkit">
+          <!-- Group 1: Backend & Architecture -->
+          <div class="tk-group reveal">
+            <h3 class="tk-group__title"><span class="tk-group__no">01</span><span data-i18n="sk.be">Backend &amp; Architecture</span></h3>
+            <div class="tk-grid">
+              <div class="tk-card" style="--brand:#512BD4">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z"/><path d="M12 12 4 7.5M12 12l8-4.5M12 12v9"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">C# / .NET Core</h4>
+                  <p class="tk-card__role" data-i18n="tk.dotnet">Core APIs · .NET 8/9/10 &amp; Framework</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#6D4AFF">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 14l-2 2 2 2M16 14l2 2-2 2M13 13l-2 6"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">ASP.NET Core</h4>
+                  <p class="tk-card__role" data-i18n="tk.aspnet">Web API, MVC &amp; RESTful Services</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#D9542A">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="2"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Clean Architecture</h4>
+                  <p class="tk-card__role" data-i18n="tk.clean">Layered, Repository &amp; DI Patterns</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#D63AFF">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z"/><path d="m9.5 12 1.8 1.8L15 10"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">JWT &amp; RBAC</h4>
+                  <p class="tk-card__role" data-i18n="tk.jwt">Token Auth &amp; Role Authorization</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="skill reveal">
-            <h3 class="skill__name"><span class="skill__no">b.</span><span data-i18n="sk.db">Database &amp; Caching</span></h3>
-            <ul class="tags tags--lg"><li>SQL Server</li><li>Entity Framework Core</li><li>LINQ</li><li>Query Optimization</li><li>Redis</li></ul>
+
+          <!-- Group 2: Database & Caching -->
+          <div class="tk-group reveal">
+            <h3 class="tk-group__title"><span class="tk-group__no">02</span><span data-i18n="sk.db">Database &amp; Caching</span></h3>
+            <div class="tk-grid">
+              <div class="tk-card" style="--brand:#CC2927">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-13"/><path d="M4.5 12c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">SQL Server</h4>
+                  <p class="tk-card__role" data-i18n="tk.sql">Schema, Indexing &amp; Query Tuning</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#5C2D91">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><path d="M10 7h4M6.5 10v7h7.5"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">EF Core &amp; LINQ</h4>
+                  <p class="tk-card__role" data-i18n="tk.ef">ORM, Migrations &amp; Data Access</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#DC382D">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 4.5-9 4.5-9-4.5L12 3Z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Redis</h4>
+                  <p class="tk-card__role" data-i18n="tk.redis">Caching &amp; Session Store</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="skill reveal">
-            <h3 class="skill__name"><span class="skill__no">c.</span><span data-i18n="sk.arch">Architecture &amp; Security</span></h3>
-            <ul class="tags tags--lg"><li>Clean Architecture</li><li>Layered Architecture</li><li>Repository Pattern</li><li>Dependency Injection</li><li>JWT</li><li>Role-based Authorization</li></ul>
+
+          <!-- Group 3: Frontend -->
+          <div class="tk-group reveal">
+            <h3 class="tk-group__title"><span class="tk-group__no">03</span><span>Frontend</span></h3>
+            <div class="tk-grid">
+              <div class="tk-card" style="--brand:#DD0031">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 4 5.8l1.3 10.6L12 21.2l6.7-4.8L20 5.8 12 2.8Z"/><path d="m8.8 15.5 3.2-7.5 3.2 7.5M9.9 13h4.2"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Angular</h4>
+                  <p class="tk-card__role" data-i18n="tk.angular">Enterprise SPA &amp; Portal UI</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#3178C6">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7.5 11h5M10 11v6M14.5 15.5c.3.9 1.1 1.5 2.1 1.5 1.1 0 1.9-.6 1.9-1.5 0-1-.8-1.3-1.9-1.6-1-.3-1.8-.6-1.8-1.5 0-.8.7-1.4 1.7-1.4.9 0 1.6.5 1.8 1.2"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">TypeScript</h4>
+                  <p class="tk-card__role" data-i18n="tk.ts">Type-safe Frontend Logic</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#D4A017">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M10.5 10.5v4.8c0 1.2-.7 1.8-1.7 1.8-.8 0-1.4-.4-1.7-1M14.2 15.6c.3.9 1.1 1.5 2.1 1.5 1.1 0 1.9-.6 1.9-1.5 0-1-.8-1.3-1.9-1.6-1-.3-1.8-.6-1.8-1.5 0-.8.7-1.4 1.7-1.4.9 0 1.6.5 1.8 1.2"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">JavaScript (ES6+)</h4>
+                  <p class="tk-card__role" data-i18n="tk.js">Interactive Web &amp; DOM</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#CC6699">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16M9 11h12"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">HTML5 / CSS3 / SCSS</h4>
+                  <p class="tk-card__role" data-i18n="tk.ui">Responsive UI &amp; Bootstrap</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="skill reveal">
-            <h3 class="skill__name"><span class="skill__no">d.</span>Frontend</h3>
-            <ul class="tags tags--lg"><li>Angular</li><li>TypeScript</li><li>HTML5</li><li>CSS3</li><li>SCSS</li><li>JavaScript (ES6)</li><li>Bootstrap</li></ul>
-          </div>
-          <div class="skill reveal">
-            <h3 class="skill__name"><span class="skill__no">e.</span><span data-i18n="sk.tools">Tools &amp; DevOps</span></h3>
-            <ul class="tags tags--lg"><li>Azure DevOps Server</li><li>Git</li><li>Docker</li><li>IIS</li></ul>
+
+          <!-- Group 4: Tools & DevOps -->
+          <div class="tk-group reveal">
+            <h3 class="tk-group__title"><span class="tk-group__no">04</span><span data-i18n="sk.tools">Tools &amp; DevOps</span></h3>
+            <div class="tk-grid">
+              <div class="tk-card" style="--brand:#0078D7">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-2.5 2-4.5 4.5-4.5 2.4 0 3.7 1.8 4.5 4.5.8 2.7 2.1 4.5 4.5 4.5 2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5c-2.4 0-3.7 1.8-4.5 4.5-.8 2.7-2.1 4.5-4.5 4.5C5 16.5 3 14.5 3 12Z"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Azure DevOps</h4>
+                  <p class="tk-card__role" data-i18n="tk.azure">Source Control &amp; Team Boards</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#2496ED">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h15.5c1.5 0 2.5-.8 2.5-2 0 4.5-3.2 8-9.5 8C6 19 3 16.5 3 13Z"/><path d="M6 10h2.5v3H6zM9.5 10H12v3H9.5zM13 10h2.5v3H13zM9.5 6.5H12V10H9.5z"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Docker</h4>
+                  <p class="tk-card__role" data-i18n="tk.docker">Containers &amp; Local Services</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#F05032">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="2.2"/><circle cx="17.5" cy="7.5" r="2.2"/><circle cx="6.5" cy="17.5" r="2.2"/><path d="M6.5 8.7v6.6M17.5 9.7c0 3-2 4.5-5 4.5H6.5"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">Git</h4>
+                  <p class="tk-card__role" data-i18n="tk.git">Branching &amp; Code Reviews</p>
+                </div>
+              </div>
+
+              <div class="tk-card" style="--brand:#00A4EF">
+                <div class="tk-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6.5" rx="2"/><rect x="3" y="13.5" width="18" height="6.5" rx="2"/><circle cx="7" cy="7.25" r=".9" fill="currentColor"/><circle cx="7" cy="16.75" r=".9" fill="currentColor"/><path d="M11 7.25h6M11 16.75h6"/></svg>
+                </div>
+                <div class="tk-card__body">
+                  <h4 class="tk-card__name">IIS</h4>
+                  <p class="tk-card__role" data-i18n="tk.iis">Windows Web Server Hosting</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -466,6 +681,7 @@
 
     <!-- ============ CONTACT ============ -->
     <section class="section contact" id="contact">
+      <span class="sec-watermark" data-parallax-num aria-hidden="true">06</span>
       <div class="container">
         <p class="sec-label reveal"><span>06</span><span data-i18n="nav.contact">Contact</span></p>
         <h2 class="contact__title reveal" style="--d:.06s" data-i18n="contact.title">Let's build something <em>reliable</em>.</h2>
@@ -500,11 +716,11 @@
         <div class="contact__cta reveal" style="--d:.3s">
           <a class="btn btn--primary" href="assets/Nguyen-Minh-Tri_Backend-Developer.pdf" download="Nguyen-Minh-Tri_Backend-Developer.pdf">
             <span data-i18n="btn.cv">Download CV</span>
-            <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg><svg><use href="#i-down"/></svg></span>
+            <span class="btn__icon btn__icon--down"><svg><use href="#i-down"/></svg></span>
           </a>
           <a class="btn btn--ghost" href="mailto:tri.nguyen.sft@gmail.com">
             <span data-i18n="btn.mail">Send an email</span>
-            <span class="btn__icon"><svg><use href="#i-arrow"/></svg><svg><use href="#i-arrow"/></svg></span>
+            <span class="btn__icon"><svg><use href="#i-arrow"/></svg></span>
           </a>
         </div>
       </div>
