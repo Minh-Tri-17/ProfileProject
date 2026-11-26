@@ -149,7 +149,7 @@
   const applyTheme = (t) => {
     root.dataset.theme = t;
     store.set('theme', t);
-    metaTheme.setAttribute('content', t === 'dark' ? '#0f0f0e' : '#f4f2ed');
+    metaTheme.setAttribute('content', t === 'dark' ? '#0f0f0e' : '#eef6fa');
   };
   applyTheme(root.dataset.theme || 'light');
 
@@ -518,6 +518,25 @@
     const ctx = bubbleCanvas.getContext('2d');
     let bw = 0, bh = 0, dpr = 1;
     let bubbles = [];
+    let dust = [];
+
+    const makeDust = () => {
+      // 2 depth layers: 0 = far/tiny (5-8px parallax), 1 = near/soft (10-15px parallax)
+      const near = Math.random() < 0.42;
+      return {
+        x: Math.random() * bw,
+        y: Math.random() * bh,
+        r: near ? 1.4 + Math.random() * 0.9 : 0.75 + Math.random() * 0.65,
+        near,
+        parallax: near ? 10 + Math.random() * 5 : 5 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * (near ? 0.14 : 0.08),
+        vy: -(0.04 + Math.random() * (near ? 0.1 : 0.05)),
+        shimmerSpeed: 0.008 + Math.random() * 0.015,
+        shimmerPhase: Math.random() * Math.PI * 2,
+        accent: Math.random() < 0.3,
+        alpha: near ? 0.16 + Math.random() * 0.14 : 0.09 + Math.random() * 0.11,
+      };
+    };
 
     const makeBubble = (randomY = false) => {
       // Depth layer: 0 = far/bokeh, 1 = mid/champagne micro, 2 = crisp delicate ring
@@ -532,6 +551,8 @@
         r,
         isBokeh,
         depth,
+        dx: 0,
+        dy: 0,
         vy: isBokeh
           ? 0.12 + Math.random() * 0.14
           : 0.22 + (7 - r) * 0.045 + Math.random() * 0.18,
@@ -555,9 +576,72 @@
       const targetCount = Math.max(22, Math.min(48, Math.round((bw * bh) / 34000)));
       while (bubbles.length < targetCount) bubbles.push(makeBubble(true));
       if (bubbles.length > targetCount) bubbles.length = targetCount;
+
+      const dustCount = Math.max(20, Math.min(30, Math.round((bw * bh) / 48000)));
+      while (dust.length < dustCount) dust.push(makeDust());
+      if (dust.length > dustCount) dust.length = dustCount;
     };
     resizeBubbles();
     addEventListener('resize', resizeBubbles, { passive: true });
+
+    // Interactive Bubble Current + Deep-Water Parallax Dust
+    const wakeBubbles = [];
+    const CURRENT_RADIUS = 120;
+    let ptrX = -999, ptrY = -999, ptrActive = false;
+    let ptrVx = 0, ptrVy = 0;
+    let dustTx = 0, dustTy = 0, dustCx = 0, dustCy = 0;
+    let lastWakeSpawn = 0;
+
+    const spawnWakeBubbles = (x, y, vx, vy, count) => {
+      for (let k = 0; k < count; k++) {
+        if (wakeBubbles.length >= 24) wakeBubbles.shift();
+        const r = 1.0 + Math.random() * 1.9;
+        wakeBubbles.push({
+          x: x + (Math.random() - 0.5) * 14,
+          y: y + (Math.random() - 0.5) * 14,
+          r,
+          vx: vx * (0.04 + Math.random() * 0.05) + (Math.random() - 0.5) * 0.45,
+          vy: -(0.35 + Math.random() * 0.45) + vy * 0.03,
+          age: 0,
+          maxAge: 46 + Math.round(Math.random() * 24),
+          accent: Math.random() < 0.42,
+          alpha: 0.22 + Math.random() * 0.14,
+        });
+      }
+    };
+
+    if (finePointer) {
+      addEventListener('pointermove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        if (ptrActive) {
+          const mvx = x - ptrX;
+          const mvy = y - ptrY;
+          ptrVx = ptrVx * 0.45 + mvx * 0.55;
+          ptrVy = ptrVy * 0.45 + mvy * 0.55;
+
+          const speed = Math.hypot(mvx, mvy);
+          const now = performance.now();
+          if (speed > 18 && now - lastWakeSpawn > 55) {
+            spawnWakeBubbles(x, y, mvx, mvy, speed > 42 ? 2 : 1);
+            lastWakeSpawn = now;
+          }
+        }
+        ptrX = x;
+        ptrY = y;
+        ptrActive = true;
+        dustTx = x / (bw || 1) - 0.5;
+        dustTy = y / (bh || 1) - 0.5;
+      }, { passive: true });
+
+      document.addEventListener('pointerleave', () => {
+        ptrActive = false;
+        ptrVx = 0;
+        ptrVy = 0;
+        dustTx = 0;
+        dustTy = 0;
+      });
+    }
 
     let lastScrollForBubbles = scrollY;
     let smoothScrollBoost = 0;
@@ -568,34 +652,103 @@
       lastScrollForBubbles = scrollY;
       smoothScrollBoost += (Math.max(-2.5, Math.min(4, scrollDelta * 0.08)) - smoothScrollBoost) * 0.12;
 
+      const ptrSpeed = Math.hypot(ptrVx, ptrVy);
+      ptrVx *= 0.85;
+      ptrVy *= 0.85;
+
+      // Smooth Lerp for opposite-to-cursor deep-water parallax dust
+      dustCx += (dustTx - dustCx) * 0.06;
+      dustCy += (dustTy - dustCy) * 0.06;
+
+      // 0. Render 2-layer deep-water parallax dust motes
+      for (let i = 0; i < dust.length; i++) {
+        const d = dust[i];
+        d.shimmerPhase += d.shimmerSpeed;
+        d.x += d.vx;
+        d.y += d.vy - smoothScrollBoost * (d.near ? 0.35 : 0.16);
+
+        if (d.x < -20) d.x = bw + 20;
+        else if (d.x > bw + 20) d.x = -20;
+        if (d.y < -20) d.y = bh + 20;
+        else if (d.y > bh + 20) d.y = -20;
+
+        // Opposite direction of cursor movement (5-15px amplitude)
+        const px = d.x - dustCx * d.parallax * 2;
+        const py = d.y - dustCy * d.parallax * 2;
+        const shimmer = 0.65 + 0.35 * Math.sin(d.shimmerPhase);
+        const a = Math.min(0.65, d.alpha * shimmer * (isDark ? 1 : 1.75));
+
+        const rgb = d.accent
+          ? (isDark ? '255, 148, 108' : '2, 132, 199')
+          : (isDark ? '240, 236, 228' : '38, 102, 142');
+
+        // Soft underwater glow halo for near-layer dust
+        if (d.near) {
+          const glow = ctx.createRadialGradient(px, py, 0, px, py, d.r * 2.8);
+          glow.addColorStop(0, `rgba(${rgb}, ${(a * 0.55).toFixed(3)})`);
+          glow.addColorStop(1, `rgba(${rgb}, 0)`);
+          ctx.beginPath();
+          ctx.arc(px, py, d.r * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = glow;
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(px, py, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rgb}, ${a.toFixed(3)})`;
+        ctx.fill();
+      }
+
+      // 1. Update & render ambient bubbles with fluid cursor parting
       for (let i = 0; i < bubbles.length; i++) {
         const b = bubbles[i];
         b.phase += b.freq;
         b.pulsePhase += b.pulseSpeed;
-        b.y -= b.vy + smoothScrollBoost * (0.4 + b.depth * 0.7);
-        b.x += Math.sin(b.phase) * b.amp;
+
+        if (ptrActive) {
+          const rx = b.x - ptrX;
+          const ry = b.y - ptrY;
+          const dist = Math.hypot(rx, ry);
+          if (dist > 0.5 && dist < CURRENT_RADIUS) {
+            const falloff = Math.pow(1 - dist / CURRENT_RADIUS, 2);
+            const depthWeight = b.isBokeh ? 0.4 : (0.55 + b.depth * 0.55);
+            const repel = (0.48 + Math.min(ptrSpeed, 30) * 0.032) * falloff * depthWeight;
+            b.dx += (rx / dist) * repel + ptrVx * 0.018 * falloff * depthWeight;
+            b.dy += (ry / dist) * repel * 0.65 + ptrVy * 0.015 * falloff * depthWeight;
+          }
+        }
+
+        // Apply buoyant rise + damped fluid displacement
+        b.x += Math.sin(b.phase) * b.amp + b.dx;
+        b.y -= b.vy + smoothScrollBoost * (0.4 + b.depth * 0.7) - b.dy;
+        b.dx *= 0.92;
+        b.dy *= 0.92;
 
         if (b.y < -b.r - 24) {
           Object.assign(b, makeBubble(false));
         } else if (b.y > bh + b.r + 90) {
           b.y = -b.r;
+        } else if (b.x < -b.r - 30) {
+          b.x = bw + b.r;
+        } else if (b.x > bw + b.r + 30) {
+          b.x = -b.r;
         }
 
         // Smooth fade near top & bottom viewport edges + gentle breathing
         const edgeFade = Math.min(1, Math.max(0, Math.min(b.y / 110, (bh - b.y) / 110)));
         const breathe = 0.82 + 0.18 * Math.sin(b.pulsePhase);
-        const a = b.alpha * edgeFade * breathe;
+        const a = Math.min(0.75, b.alpha * edgeFade * breathe * (isDark ? 1 : 1.85));
         if (a <= 0.004) continue;
 
         const rgb = b.accent
-          ? (isDark ? '255, 118, 76' : '217, 84, 42')
-          : (isDark ? '228, 224, 214' : '120, 114, 102');
+          ? (isDark ? '255, 118, 76' : '2, 132, 199')
+          : (isDark ? '228, 224, 214' : '38, 102, 142');
 
         if (b.isBokeh) {
           // Soft out-of-focus depth halo
           const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
-          g.addColorStop(0, `rgba(${rgb}, ${(a * 0.9).toFixed(3)})`);
-          g.addColorStop(0.6, `rgba(${rgb}, ${(a * 0.35).toFixed(3)})`);
+          g.addColorStop(0, `rgba(${rgb}, ${(a * (isDark ? 0.9 : 1.05)).toFixed(3)})`);
+          g.addColorStop(0.6, `rgba(${rgb}, ${(a * (isDark ? 0.35 : 0.48)).toFixed(3)})`);
           g.addColorStop(1, `rgba(${rgb}, 0)`);
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
@@ -605,30 +758,60 @@
           // Crisp champagne micro-bubble: hollow center, delicate rim & crescent glint
           const g = ctx.createRadialGradient(b.x, b.y, b.r * 0.15, b.x, b.y, b.r);
           g.addColorStop(0, `rgba(${rgb}, 0)`);
-          g.addColorStop(0.72, `rgba(${rgb}, ${(a * 0.18).toFixed(3)})`);
-          g.addColorStop(1, `rgba(${rgb}, ${(a * 0.55).toFixed(3)})`);
+          g.addColorStop(0.72, `rgba(${rgb}, ${(a * (isDark ? 0.18 : 0.28)).toFixed(3)})`);
+          g.addColorStop(1, `rgba(${rgb}, ${(a * (isDark ? 0.55 : 0.72)).toFixed(3)})`);
 
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
           ctx.fillStyle = g;
           ctx.fill();
 
-          ctx.lineWidth = 0.65;
-          ctx.strokeStyle = `rgba(${rgb}, ${(a * 0.75).toFixed(3)})`;
+          ctx.lineWidth = isDark ? 0.65 : 1.0;
+          ctx.strokeStyle = `rgba(${rgb}, ${(a * (isDark ? 0.75 : 0.95)).toFixed(3)})`;
           ctx.stroke();
 
           // Tiny upper-left crescent highlight
           if (b.r > 2.2) {
             ctx.beginPath();
             ctx.arc(b.x, b.y, b.r * 0.72, -Math.PI * 0.88, -Math.PI * 0.42);
-            ctx.lineWidth = 0.75;
+            ctx.lineWidth = isDark ? 0.75 : 1.0;
             ctx.strokeStyle = isDark
               ? `rgba(255, 255, 255, ${(a * 0.85).toFixed(3)})`
-              : `rgba(255, 255, 255, ${Math.min(1, a * 1.6).toFixed(3)})`;
+              : `rgba(255, 255, 255, ${Math.min(1, a * 1.4).toFixed(3)})`;
             ctx.stroke();
           }
         }
       }
+
+      // 2. Render ephemeral tiny wake-trail bubbles spawned by fast cursor movement
+      for (let i = wakeBubbles.length - 1; i >= 0; i--) {
+        const wb = wakeBubbles[i];
+        wb.age += 1;
+        if (wb.age >= wb.maxAge) {
+          wakeBubbles.splice(i, 1);
+          continue;
+        }
+        wb.x += wb.vx;
+        wb.y += wb.vy;
+        wb.vx *= 0.94;
+        wb.vy = wb.vy * 0.96 - 0.015; // gentle upward buoyancy
+
+        const p = wb.age / wb.maxAge;
+        const fade = Math.min(1, p * 5) * Math.pow(1 - p, 1.5);
+        const a = Math.min(0.8, wb.alpha * fade * (isDark ? 1 : 1.8));
+        if (a <= 0.004) continue;
+
+        const rgb = wb.accent
+          ? (isDark ? '255, 118, 76' : '2, 132, 199')
+          : (isDark ? '228, 224, 214' : '38, 102, 142');
+
+        ctx.beginPath();
+        ctx.arc(wb.x, wb.y, wb.r, 0, Math.PI * 2);
+        ctx.lineWidth = isDark ? 0.6 : 0.95;
+        ctx.strokeStyle = `rgba(${rgb}, ${(a * 0.95).toFixed(3)})`;
+        ctx.stroke();
+      }
+
       requestAnimationFrame(drawBubbles);
     };
     requestAnimationFrame(drawBubbles);
