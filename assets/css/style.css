@@ -290,18 +290,66 @@ main, .footer { position: relative; z-index: 1; }
 .logo__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-bottom: 2px; transition: transform .5s var(--ease); }
 .logo:hover .logo__dot { transform: translateY(-6px); }
 
-.nav { display: flex; gap: 6px; padding: 5px; border-radius: 999px; }
+.nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 9999px;
+}
+
+/* Sliding Glass Pill (Floating Glassmorphic Indicator) */
+.nav__pill {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  z-index: 0;
+  width: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(2, 132, 199, 0.1);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(2, 132, 199, 0.24);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    0 4px 12px -4px rgba(12, 34, 51, 0.12);
+  transform: translate3d(0, 0, 0);
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, width, opacity;
+}
+[data-theme="dark"] .nav__pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 6px 16px -6px rgba(0, 0, 0, 0.45);
+}
+.nav__pill.is-visible {
+  opacity: 1;
+}
+
 .nav__link {
-  position: relative; padding: 7px 14px; font-size: 14px; color: var(--muted);
-  border-radius: 999px; transition: color .3s;
+  position: relative;
+  z-index: 1;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  border-radius: 9999px;
+  transition: color 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.nav__link::after {
-  content: ""; position: absolute; left: 50%; bottom: 2px; width: 4px; height: 4px; border-radius: 50%;
-  background: var(--accent); transform: translateX(-50%) scale(0); transition: transform .4s var(--ease);
+.nav__link:hover,
+.nav__link.is-active {
+  color: var(--text);
 }
-.nav__link:hover { color: var(--text); }
-.nav__link.is-active { color: var(--text); }
-.nav__link.is-active::after { transform: translateX(-50%) scale(1); }
+[data-theme="dark"] .nav__link:hover,
+[data-theme="dark"] .nav__link.is-active {
+  color: #ffffff;
+}
 
 .header__actions { display: flex; align-items: center; gap: 8px; }
 
@@ -1131,37 +1179,58 @@ html[lang="vi"] .lang-toggle__opt[data-lang="vi"] { color: var(--bg); }
 
 .tk-card {
   --brand: var(--accent);
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   height: 100%;
   padding: 16px 18px;
-  border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  cursor: default;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(135%);
+  backdrop-filter: blur(10px) saturate(135%);
+  border: 1px solid color-mix(in srgb, var(--line-2) 65%, transparent);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, .72),
+    inset 0 -3px 8px rgba(12, 34, 51, .05),
+    0 6px 18px -12px rgba(12, 34, 51, .16);
+  cursor: pointer;
+  transform-origin: center center;
+  will-change: transform;
   transition:
-    transform .32s var(--ease),
-    background-color .35s var(--ease),
-    border-color .35s var(--ease),
-    box-shadow .35s var(--ease);
+    transform .45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color .4s var(--ease),
+    border-color .4s var(--ease),
+    box-shadow .4s var(--ease);
+}
+[data-theme="dark"] .tk-card {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .1),
+    inset 0 -3px 10px rgba(0, 0, 0, .45),
+    0 8px 20px -12px rgba(0, 0, 0, .55);
 }
 
 .tk-card__icon {
   flex: none;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 15px;
   display: grid;
   place-items: center;
-  background: var(--bg-2);
+  background: color-mix(in srgb, var(--bg-2) 85%, transparent);
   border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
   color: var(--muted);
   transition:
-    color .32s var(--ease),
-    background-color .35s var(--ease),
-    border-color .35s var(--ease),
-    transform .35s var(--ease);
+    color .35s var(--ease),
+    background-color .38s var(--ease),
+    border-color .38s var(--ease),
+    box-shadow .38s var(--ease),
+    transform .45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-theme="dark"] .tk-card__icon {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
 }
 .tk-card__icon svg {
   width: 21px;
@@ -1187,25 +1256,61 @@ html[lang="vi"] .lang-toggle__opt[data-lang="vi"] { color: var(--bg); }
   color: var(--muted);
 }
 
-/* Hover: subtle brand tint reveal on icon & smooth card surface shift */
+/* Hover: soft translucent jelly wobble + brand tint reveal */
 .tk-card:hover {
-  transform: translateY(-2px);
-  background: color-mix(in srgb, var(--brand) 6%, var(--surface));
-  border-color: color-mix(in srgb, var(--brand) 36%, var(--line));
-  box-shadow: 0 12px 26px -16px color-mix(in srgb, var(--brand) 40%, rgba(0, 0, 0, .25));
+  animation: tkJelly 640ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  background: color-mix(in srgb, var(--brand) 9%, color-mix(in srgb, var(--surface) 84%, transparent));
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, .82),
+    inset 0 -4px 10px color-mix(in srgb, var(--brand) 12%, transparent),
+    0 14px 28px -14px color-mix(in srgb, var(--brand) 48%, rgba(0, 0, 0, .2));
 }
 .tk-card:hover .tk-card__icon {
+  animation: tkIconJelly 680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   color: var(--brand);
-  background: color-mix(in srgb, var(--brand) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--brand) 32%, transparent);
-  transform: scale(1.04);
+  background: color-mix(in srgb, var(--brand) 15%, var(--surface));
+  border-color: color-mix(in srgb, var(--brand) 36%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .65),
+    0 6px 14px -8px color-mix(in srgb, var(--brand) 50%, transparent);
 }
 [data-theme="dark"] .tk-card:hover {
-  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
-  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  background: color-mix(in srgb, var(--brand) 13%, color-mix(in srgb, var(--surface) 86%, transparent));
+  border-color: color-mix(in srgb, var(--brand) 48%, var(--line));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 -4px 12px color-mix(in srgb, var(--brand) 18%, rgba(0, 0, 0, .4)),
+    0 16px 30px -14px color-mix(in srgb, var(--brand) 42%, rgba(0, 0, 0, .65));
 }
 [data-theme="dark"] .tk-card:hover .tk-card__icon {
-  background: color-mix(in srgb, var(--brand) 16%, var(--surface));
+  background: color-mix(in srgb, var(--brand) 18%, var(--surface));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    0 6px 16px -8px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+/* Squishy press on click/tap */
+.tk-card:active {
+  animation: none;
+  transform: translateY(0) scale(1.035, 0.935);
+}
+
+@keyframes tkJelly {
+  0%   { transform: translateY(0) scale(1, 1); }
+  22%  { transform: translateY(-4px) scale(1.04, 0.95); }
+  45%  { transform: translateY(-2px) scale(0.98, 1.03); }
+  68%  { transform: translateY(-3px) scale(1.016, 0.988); }
+  85%  { transform: translateY(-2.5px) scale(0.996, 1.006); }
+  100% { transform: translateY(-2.5px) scale(1, 1); }
+}
+
+@keyframes tkIconJelly {
+  0%   { transform: scale(1, 1); }
+  28%  { transform: scale(1.12, 0.9); }
+  52%  { transform: scale(0.95, 1.08); }
+  76%  { transform: scale(1.05, 0.98); }
+  100% { transform: scale(1.04, 1.04); }
 }
 
 .edu {

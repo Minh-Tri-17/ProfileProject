@@ -283,12 +283,120 @@
   addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleMenu(false); });
   matchMedia('(min-width: 961px)').addEventListener('change', (e) => { if (e.matches) toggleMenu(false); });
 
-  /* Active nav link */
+  /* Active nav link + Sliding Glass Pill (60fps Spring Physics + Scroll-Spy) */
+  const primaryNav = $('#primaryNav');
+  const navPill = $('#navPill');
   const navLinks = $$('.nav__link');
+  let activeNavLink = null;
+  let hoveredNavLink = null;
+
+  // Damped spring state for silky momentum-preserving glide
+  let pillX = 0, pillW = 0, pillVx = 0, pillVw = 0;
+  let pillTx = 0, pillTw = 0, pillVisible = false, pillRaf = 0;
+  const PILL_STIFFNESS = 0.14;
+  const PILL_DAMPING = 0.74;
+
+  const renderNavPill = () => {
+    const squashY = 1 - Math.min(0.055, Math.abs(pillVx) * 0.0022);
+    navPill.style.width = `${pillW.toFixed(2)}px`;
+    navPill.style.transform = `translate3d(${pillX.toFixed(2)}px, 0, 0) scaleY(${squashY.toFixed(4)})`;
+  };
+
+  const tickNavPill = () => {
+    pillVx = (pillVx + (pillTx - pillX) * PILL_STIFFNESS) * PILL_DAMPING;
+    pillVw = (pillVw + (pillTw - pillW) * PILL_STIFFNESS) * PILL_DAMPING;
+    pillX += pillVx;
+    pillW += pillVw;
+    renderNavPill();
+
+    const settled =
+      Math.abs(pillTx - pillX) < 0.06 &&
+      Math.abs(pillTw - pillW) < 0.06 &&
+      Math.abs(pillVx) < 0.04 &&
+      Math.abs(pillVw) < 0.04;
+
+    if (!settled) {
+      pillRaf = requestAnimationFrame(tickNavPill);
+    } else {
+      pillX = pillTx;
+      pillW = pillTw;
+      pillVx = 0;
+      pillVw = 0;
+      renderNavPill();
+      pillRaf = 0;
+    }
+  };
+
+  const moveNavPill = (target, instant = false) => {
+    if (!navPill) return;
+    if (!target) {
+      pillVisible = false;
+      navPill.classList.remove('is-visible');
+      return;
+    }
+    pillTx = target.offsetLeft;
+    pillTw = target.offsetWidth;
+
+    // Snap immediately when blooming from hidden or on resize/reduced-motion
+    if (instant || !pillVisible || reduceMotion) {
+      pillX = pillTx;
+      pillW = pillTw;
+      pillVx = 0;
+      pillVw = 0;
+      renderNavPill();
+      pillVisible = true;
+      navPill.classList.add('is-visible');
+      return;
+    }
+
+    pillVisible = true;
+    navPill.classList.add('is-visible');
+    if (!pillRaf) pillRaf = requestAnimationFrame(tickNavPill);
+  };
+
+  const setActiveNav = (link) => {
+    activeNavLink = link || null;
+    navLinks.forEach((l) => l.classList.toggle('is-active', l === activeNavLink));
+    if (!hoveredNavLink) moveNavPill(activeNavLink);
+  };
+
+  if (primaryNav && navPill) {
+    navLinks.forEach((link) => {
+      link.addEventListener('pointerenter', () => {
+        hoveredNavLink = link;
+        moveNavPill(link);
+      });
+      link.addEventListener('click', () => {
+        setActiveNav(link);
+      });
+    });
+
+    primaryNav.addEventListener('pointerleave', () => {
+      hoveredNavLink = null;
+      moveNavPill(activeNavLink);
+    });
+
+    // Re-measure pill width/position on resize, font load & EN/VI toggle
+    const syncNavPill = () => moveNavPill(hoveredNavLink || activeNavLink, true);
+    addEventListener('resize', syncNavPill, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(syncNavPill);
+    }
+    const langBtnNav = $('#langToggle');
+    if (langBtnNav) {
+      langBtnNav.addEventListener('click', () => setTimeout(syncNavPill, 210));
+    }
+  }
+
   const navObserver = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       if (!en.isIntersecting) return;
-      navLinks.forEach((l) => l.classList.toggle('is-active', l.getAttribute('href') === `#${en.target.id}`));
+      if (en.target.id === 'hero') {
+        setActiveNav(null);
+        return;
+      }
+      const match = navLinks.find((l) => l.getAttribute('href') === `#${en.target.id}`);
+      if (match) setActiveNav(match);
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
   $$('section[id]').forEach((s) => navObserver.observe(s));
