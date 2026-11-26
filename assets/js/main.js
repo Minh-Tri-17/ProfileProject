@@ -364,6 +364,111 @@
   requestAnimationFrame(heroLoop);
 
   /* -------------------------------------------------------
+     Hero Live Terminal — Initial Stream + Interactive Re-fetch
+     ------------------------------------------------------- */
+  (() => {
+    const win = $('#apiTerminal');
+    const reqBtn = $('#apiReqBtn');
+    const statusBtn = $('#apiStatusBtn');
+    const endpointEl = $('#apiEndpoint');
+    const statusText = $('#apiStatusText');
+    const msEl = $('#apiMs');
+    const lines = $$('#apiCode .win__line');
+    if (!win || !reqBtn || !statusBtn || !endpointEl || !msEl || !lines.length) return;
+
+    const ENDPOINT = endpointEl.textContent.trim();
+    let currentMs = 38;
+    let busy = false;
+    let timers = [];
+
+    const clearTimers = () => {
+      timers.forEach((id) => clearTimeout(id));
+      timers = [];
+    };
+
+    const nextLatency = () => {
+      let v = 31 + Math.floor(Math.random() * 12); // 31ms – 42ms
+      if (v === currentMs) v = v >= 42 ? 31 : v + 1;
+      currentMs = v;
+      return v;
+    };
+
+    const triggerScan = () => {
+      win.classList.remove('is-scanning');
+      void win.offsetWidth;
+      win.classList.add('is-scanning');
+      timers.push(setTimeout(() => win.classList.remove('is-scanning'), 620));
+    };
+
+    const streamLines = (delayPerLine = 38, onDone) => {
+      lines.forEach((line) => line.classList.add('is-hidden'));
+      lines.forEach((line, idx) => {
+        timers.push(setTimeout(() => {
+          line.classList.remove('is-hidden');
+          if (idx === lines.length - 1 && onDone) onDone();
+        }, idx * delayPerLine));
+      });
+    };
+
+    const runInitialStream = () => {
+      if (reduceMotion) return;
+      busy = true;
+      endpointEl.textContent = '';
+      lines.forEach((line) => line.classList.add('is-hidden'));
+      win.classList.add('is-fetching');
+      if (statusText) statusText.textContent = 'FETCH';
+
+      // 1. Type endpoint path clearly after card fades into view (48ms/char)
+      const startDelay = 420;
+      const charDelay = 48;
+      for (let i = 1; i <= ENDPOINT.length; i++) {
+        timers.push(setTimeout(() => {
+          endpointEl.textContent = ENDPOINT.slice(0, i);
+        }, startDelay + i * charDelay));
+      }
+
+      // 2. Flip to 200 OK & stream JSON lines (45ms/line)
+      const afterType = startDelay + ENDPOINT.length * charDelay + 140;
+      timers.push(setTimeout(() => {
+        win.classList.remove('is-fetching');
+        if (statusText) statusText.textContent = '200 OK';
+        triggerScan();
+        streamLines(45, () => { busy = false; });
+      }, afterType));
+    };
+
+    const refetch = () => {
+      if (busy) return;
+      clearTimers();
+      const ms = nextLatency();
+
+      if (reduceMotion) {
+        msEl.textContent = `${ms} ms`;
+        return;
+      }
+
+      busy = true;
+      win.classList.add('is-fetching');
+      if (statusText) statusText.textContent = 'FETCH';
+      lines.forEach((line) => line.classList.add('is-hidden'));
+      triggerScan();
+
+      timers.push(setTimeout(() => {
+        win.classList.remove('is-fetching');
+        if (statusText) statusText.textContent = '200 OK';
+        msEl.textContent = `${ms} ms`;
+        msEl.classList.add('is-updated');
+        timers.push(setTimeout(() => msEl.classList.remove('is-updated'), 650));
+        streamLines(42, () => { busy = false; });
+      }, 160));
+    };
+
+    reqBtn.addEventListener('click', refetch);
+    statusBtn.addEventListener('click', refetch);
+    runInitialStream();
+  })();
+
+  /* -------------------------------------------------------
      Project cards — Window Depth Effect with Lerp (0.09) in rAF
      ------------------------------------------------------- */
   if (finePointer && !reduceMotion) {
@@ -423,6 +528,38 @@
         wake();
       });
     });
+
+    /* Projects Grid — Linear/Vercel Spotlight 1px Border across nearby cards */
+    const projectsGrid = $('.projects');
+    if (projectsGrid) {
+      const projectCards = $$('.project', projectsGrid);
+      let spotRaf = 0;
+      let lastEvt = null;
+
+      const updateSpotlight = () => {
+        spotRaf = 0;
+        if (!lastEvt) return;
+        const { clientX, clientY } = lastEvt;
+        for (let i = 0; i < projectCards.length; i++) {
+          const card = projectCards[i];
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--spot-x', `${(clientX - r.left).toFixed(1)}px`);
+          card.style.setProperty('--spot-y', `${(clientY - r.top).toFixed(1)}px`);
+        }
+      };
+
+      projectsGrid.addEventListener('pointerenter', () => {
+        projectsGrid.classList.add('has-pointer');
+      });
+      projectsGrid.addEventListener('pointermove', (e) => {
+        lastEvt = e;
+        if (!spotRaf) spotRaf = requestAnimationFrame(updateSpotlight);
+      }, { passive: true });
+      projectsGrid.addEventListener('pointerleave', () => {
+        projectsGrid.classList.remove('has-pointer');
+        lastEvt = null;
+      });
+    }
   }
 
   /* -------------------------------------------------------
@@ -519,6 +656,102 @@
     let bw = 0, bh = 0, dpr = 1;
     let bubbles = [];
     let dust = [];
+    let fishes = [];
+
+    const makeFish = (index) => {
+      const near = index % 2 === 0;
+      const goRight = index % 2 === 0;
+      const scale = near ? 0.95 + Math.random() * 0.35 : 0.62 + Math.random() * 0.24;
+      const baseSpeed = near ? 0.55 + Math.random() * 0.25 : 0.36 + Math.random() * 0.18;
+      return {
+        x: Math.random() * (bw || innerWidth),
+        y: (0.14 + Math.random() * 0.72) * (bh || innerHeight),
+        angle: goRight ? (Math.random() - 0.5) * 0.4 : Math.PI + (Math.random() - 0.5) * 0.4,
+        targetAngle: goRight ? 0 : Math.PI,
+        baseSpeed,
+        speed: baseSpeed,
+        scale,
+        near,
+        tailPhase: Math.random() * Math.PI * 2,
+        wanderTimer: 40 + Math.random() * 140,
+        accent: index % 3 === 0,
+        alpha: near ? 0.19 + Math.random() * 0.06 : 0.11 + Math.random() * 0.05,
+        fleeCooldown: 0,
+      };
+    };
+
+    const drawFish = (f, isDark) => {
+      const wag = Math.sin(f.tailPhase);
+      const wag2 = Math.sin(f.tailPhase - 1.15);
+      const s = f.scale;
+      const a = f.alpha * (isDark ? 1 : 1.15);
+
+      const bodyRgb = f.accent
+        ? (isDark ? '255, 118, 76' : '2, 132, 199')
+        : (isDark ? '220, 214, 204' : '24, 84, 122');
+      const finRgb = f.accent
+        ? (isDark ? '255, 168, 128' : '56, 189, 248')
+        : (isDark ? '245, 240, 232' : '56, 136, 178');
+
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.rotate(f.angle);
+      ctx.scale(s, s);
+
+      // Pectoral fins (gently rowing)
+      const finWave = wag * 2.2;
+      ctx.fillStyle = `rgba(${finRgb}, ${(a * 0.55).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(4, -3.5);
+      ctx.quadraticCurveTo(-2, -13 - finWave * 0.5, -10, -10 - finWave);
+      ctx.quadraticCurveTo(-5, -5, -2, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(4, 3.5);
+      ctx.quadraticCurveTo(-2, 13 + finWave * 0.5, -10, 10 + finWave);
+      ctx.quadraticCurveTo(-5, 5, -2, 3);
+      ctx.closePath();
+      ctx.fill();
+
+      // Flowing forked tail fin (sinuous S-curve)
+      const tailMidY = wag * 4.5;
+      const tailEndY = wag2 * 9.5;
+      ctx.fillStyle = `rgba(${finRgb}, ${(a * 0.65).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(-16, tailMidY * 0.55);
+      ctx.quadraticCurveTo(-24, tailMidY - 5, -31, tailEndY - 8.5);
+      ctx.quadraticCurveTo(-26, tailEndY * 0.85, -24, tailEndY * 0.72);
+      ctx.quadraticCurveTo(-26, tailEndY * 0.85, -31, tailEndY + 8.5);
+      ctx.quadraticCurveTo(-24, tailMidY + 5, -16, tailMidY * 0.55);
+      ctx.closePath();
+      ctx.fill();
+
+      // Sleek tapered koi/ocean fish body with subtle longitudinal gradient
+      const bg = ctx.createLinearGradient(16, 0, -20, 0);
+      bg.addColorStop(0, `rgba(${bodyRgb}, ${(a * 1.15).toFixed(3)})`);
+      bg.addColorStop(0.65, `rgba(${bodyRgb}, ${(a * 0.88).toFixed(3)})`);
+      bg.addColorStop(1, `rgba(${finRgb}, ${(a * 0.45).toFixed(3)})`);
+      ctx.fillStyle = bg;
+
+      ctx.beginPath();
+      ctx.moveTo(16, 0);
+      ctx.bezierCurveTo(12, -7.2, -2, -6.5 + wag * 1.4, -18, tailMidY * 0.55);
+      ctx.bezierCurveTo(-2, 6.5 + wag * 1.4, 12, 7.2, 16, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Subtle dorsal spine ridge highlight
+      ctx.strokeStyle = `rgba(255, 255, 255, ${(a * (isDark ? 0.35 : 0.65)).toFixed(3)})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(9, 0);
+      ctx.quadraticCurveTo(-4, wag * 1.6, -15, tailMidY * 0.5);
+      ctx.stroke();
+
+      ctx.restore();
+    };
 
     const makeDust = () => {
       // 2 depth layers: 0 = far/tiny (5-8px parallax), 1 = near/soft (10-15px parallax)
@@ -580,6 +813,10 @@
       const dustCount = Math.max(20, Math.min(30, Math.round((bw * bh) / 48000)));
       while (dust.length < dustCount) dust.push(makeDust());
       if (dust.length > dustCount) dust.length = dustCount;
+
+      const fishCount = bw < 640 ? 3 : 5;
+      while (fishes.length < fishCount) fishes.push(makeFish(fishes.length));
+      if (fishes.length > fishCount) fishes.length = fishCount;
     };
     resizeBubbles();
     addEventListener('resize', resizeBubbles, { passive: true });
@@ -697,6 +934,62 @@
         ctx.arc(px, py, d.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${rgb}, ${a.toFixed(3)})`;
         ctx.fill();
+      }
+
+      // 0.5 Update & render graceful swimming fish silhouettes
+      for (let i = 0; i < fishes.length; i++) {
+        const f = fishes[i];
+        f.wanderTimer -= 1;
+        if (f.wanderTimer <= 0) {
+          f.targetAngle = f.angle + (Math.random() - 0.5) * 0.75;
+          f.wanderTimer = 90 + Math.random() * 170;
+        }
+
+        // Gently keep fish within comfortable vertical swimming band
+        if (f.y < bh * 0.08) f.targetAngle = Math.atan2(0.35, Math.cos(f.angle) || 1);
+        else if (f.y > bh * 0.92) f.targetAngle = Math.atan2(-0.35, Math.cos(f.angle) || 1);
+
+        // Smoothly steer away if cursor approaches within 150px
+        if (f.fleeCooldown > 0) f.fleeCooldown -= 1;
+        if (ptrActive) {
+          const fx = f.x - ptrX;
+          const fy = f.y - ptrY;
+          const dist = Math.hypot(fx, fy);
+          if (dist > 1 && dist < 150) {
+            f.targetAngle = Math.atan2(fy, fx);
+            f.speed = Math.min(f.baseSpeed * 3.1, f.speed + 0.14);
+            if (f.fleeCooldown === 0) {
+              spawnWakeBubbles(
+                f.x - Math.cos(f.angle) * 20 * f.scale,
+                f.y - Math.sin(f.angle) * 20 * f.scale,
+                -Math.cos(f.angle) * 8,
+                -Math.sin(f.angle) * 8,
+                1
+              );
+              f.fleeCooldown = 28;
+            }
+          }
+        }
+
+        // Shortest-angle turn interpolation + speed relaxation
+        let diff = f.targetAngle - f.angle;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        f.angle += diff * 0.035;
+        f.speed += (f.baseSpeed - f.speed) * 0.03;
+
+        f.tailPhase += 0.085 + f.speed * 0.11;
+        f.x += Math.cos(f.angle) * f.speed;
+        f.y += Math.sin(f.angle) * f.speed - smoothScrollBoost * (f.near ? 0.45 : 0.22);
+
+        // Seamless offscreen wrap
+        const pad = 70;
+        if (f.x < -pad) f.x = bw + pad;
+        else if (f.x > bw + pad) f.x = -pad;
+        if (f.y < -pad) f.y = bh + pad;
+        else if (f.y > bh + pad) f.y = -pad;
+
+        drawFish(f, isDark);
       }
 
       // 1. Update & render ambient bubbles with fluid cursor parting

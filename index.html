@@ -145,52 +145,54 @@
         </div>
 
         <!-- 2.5D scene -->
-        <div class="hero__visual load-in" style="--d:.3s" aria-hidden="true">
+        <div class="hero__visual load-in" style="--d:.3s">
           <div class="scene" id="scene">
             <div class="scene__inner" id="sceneInner">
-              <div class="layer layer--plate">
+              <div class="layer layer--plate" aria-hidden="true">
                 <span class="plate__ring plate__ring--1"></span>
                 <span class="plate__ring plate__ring--2"></span>
                 <span class="plate__label">// enterprise-grade · since 2023</span>
               </div>
 
               <div class="layer layer--card">
-                <div class="win">
+                <div class="win" id="apiTerminal">
+                  <div class="win__scan" aria-hidden="true"></div>
                   <div class="win__bar">
                     <i></i><i></i><i></i>
                     <span>api.nexusos.local</span>
+                    <span class="win__hint" aria-hidden="true">↻ click to re-fetch</span>
                   </div>
-                  <div class="win__req">
-                    <b>GET</b><span>/api/v1/employees?page=1</span>
-                  </div>
+                  <button class="win__req" id="apiReqBtn" type="button" title="Click to re-fetch API" aria-label="Re-fetch GET /api/v1/employees?page=1">
+                    <b>GET</b><span id="apiEndpoint">/api/v1/employees?page=1</span>
+                  </button>
                   <div class="win__status">
-                    <span class="ok"><i></i>200 OK</span>
-                    <span class="ms">38 ms</span>
+                    <button class="ok" id="apiStatusBtn" type="button" title="Click to re-fetch API" aria-label="Status 200 OK — click to re-fetch"><i></i><span id="apiStatusText">200 OK</span></button>
+                    <span class="ms" id="apiMs">38 ms</span>
                     <span class="sz">1.2 kB</span>
                   </div>
-<pre class="win__code"><span class="p">{</span>
-  <span class="k">"data"</span><span class="p">: [{</span>
-    <span class="k">"id"</span><span class="p">:</span> <span class="n">1024</span><span class="p">,</span>
-    <span class="k">"name"</span><span class="p">:</span> <span class="s">"Nguyen Minh Tri"</span><span class="p">,</span>
-    <span class="k">"role"</span><span class="p">:</span> <span class="s">"Software Engineer"</span>
-  <span class="p">}],</span>
-  <span class="k">"auth"</span><span class="p">:</span> <span class="s">"JWT · RBAC"</span><span class="p">,</span>
-  <span class="k">"users"</span><span class="p">:</span> <span class="n">10000</span>
-<span class="p">}</span><span class="caret"></span></pre>
+<pre class="win__code" id="apiCode"><span class="win__line"><span class="p">{</span></span>
+<span class="win__line">  <span class="k">"data"</span><span class="p">: [{</span></span>
+<span class="win__line">    <span class="k">"id"</span><span class="p">:</span> <span class="n">1024</span><span class="p">,</span></span>
+<span class="win__line">    <span class="k">"name"</span><span class="p">:</span> <span class="s">"Nguyen Minh Tri"</span><span class="p">,</span></span>
+<span class="win__line">    <span class="k">"role"</span><span class="p">:</span> <span class="s">"Software Engineer"</span></span>
+<span class="win__line">  <span class="p">}],</span></span>
+<span class="win__line">  <span class="k">"auth"</span><span class="p">:</span> <span class="s">"JWT · RBAC"</span><span class="p">,</span></span>
+<span class="win__line">  <span class="k">"users"</span><span class="p">:</span> <span class="n">10000</span></span>
+<span class="win__line"><span class="p">}</span><span class="caret"></span></span></pre>
                 </div>
               </div>
 
-              <div class="layer chip chip--1"><span><b class="c1"></b>.NET 10</span></div>
-              <div class="layer chip chip--2"><span><b class="c2"></b>Angular</span></div>
-              <div class="layer chip chip--3"><span><b class="c3"></b>SQL Server</span></div>
-              <div class="layer badge">
+              <div class="layer chip chip--1" aria-hidden="true"><span><b class="c1"></b>.NET 10</span></div>
+              <div class="layer chip chip--2" aria-hidden="true"><span><b class="c2"></b>Angular</span></div>
+              <div class="layer chip chip--3" aria-hidden="true"><span><b class="c3"></b>SQL Server</span></div>
+              <div class="layer badge" aria-hidden="true">
                 <span>
                   <strong>−20%</strong>
                   <small data-i18n="hero.badge">API response time</small>
                 </span>
               </div>
             </div>
-            <div class="scene__shadow"></div>
+            <div class="scene__shadow" aria-hidden="true"></div>
           </div>
         </div>
       </div>
