@@ -1,0 +1,6 @@
+# Local agent skills / config
+.agents/
+
+# OS & editor files
+.DS_Store
+Thumbs.db
